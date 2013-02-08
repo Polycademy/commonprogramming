@@ -10,7 +10,8 @@
         "behat/mink-zombie-driver": "*",
         "phpunit/phpunit": "3.7.*",
         "phing/phing": "2.4.13",
-        "leafo/lessphp": "0.3.8"
+        "leafo/lessphp": "0.3.8",
+        "twig/twig": "1.*"
     },
     "config": {
         "bin-dir": "bin/"

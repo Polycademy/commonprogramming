@@ -35,7 +35,13 @@
 |	http://codeigniter.com/user_guide/general/hooks.html
 |
 */
-
+//pre_system autoloader
+$hook['pre_system'] = array(
+    'class' => 'Autoloader',
+    'function'  => '__construct',
+    'filename'  => 'Autoloader.php',
+    'filepath'  => 'hooks',
+);
 
 /* End of file hooks.php */
 /* Location: ./application/config/hooks.php */
