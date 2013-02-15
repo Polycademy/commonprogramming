@@ -6,3 +6,4 @@
 vendor/*
 bin/*
 .c9revisions/*
+tools/*
