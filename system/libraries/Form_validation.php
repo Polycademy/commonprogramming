@@ -356,7 +356,7 @@ class CI_Form_validation {
 	 */
 	public function error_string($prefix = '', $suffix = '')
 	{
-		// No errrors, validation passes!
+		// No errors, validation passes!
 		if (count($this->_error_array) === 0)
 		{
 			return '';
@@ -517,7 +517,7 @@ class CI_Form_validation {
 				{
 					if (isset($_POST[$row['field']]))
 					{
-						$_POST[$row['field']] = $this->prep_for_form($row['postdata']);
+						$_POST[$row['field']] = $row['postdata'];
 					}
 				}
 				else
@@ -543,14 +543,14 @@ class CI_Form_validation {
 						$array = array();
 						foreach ($row['postdata'] as $k => $v)
 						{
-							$array[$k] = $this->prep_for_form($v);
+							$array[$k] = $v;
 						}
 
 						$post_ref = $array;
 					}
 					else
 					{
-						$post_ref = $this->prep_for_form($row['postdata']);
+						$post_ref = $row['postdata'];
 					}
 				}
 			}
