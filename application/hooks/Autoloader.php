@@ -8,15 +8,9 @@ class Autoloader{
         if(file_exists(FCPATH . '/vendor/autoload.php')){
             include_once FCPATH . '/vendor/autoload.php';
         }
- 
+		
         //STANDARD AUTOLOADER
         spl_autoload_register(array($this, 'autoload'));
- 
-        //use vendor/package/Library.php for package related stuff (psr-0 kind of thing) (each package can have its own autoloader and get its own interfaces and abstracts)
-        //use Library.php for non-packaged libraries framework specific
-        //use abstracts/aLibrary.php for non-packaged abstracts framework specific
-        //use interfaces/iLibrary.php for non-packaged interfaces framework specific
-        //MY_Library.php will be loaded using $this->load as a CI specific library
  
     }
  
