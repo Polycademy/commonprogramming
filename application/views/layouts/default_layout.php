@@ -1,4 +1,4 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
-<? partial('header', $header) ?>
+<? Template::partial('header', $header) ?>
 <?= $yield ?>
-<? partial('footer', $footer) ?>
+<? Template::partial('footer', $footer) ?>
