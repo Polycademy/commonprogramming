@@ -1,5 +1,5 @@
 {
-    "hash": "afd3d0bb9ec28424a77cc15295934dbc",
+    "hash": "a9fc1d1d3a4b0d76632f3f3d65224684",
     "packages": [
         {
             "name": "alexandresalome/php-selenium",
@@ -227,31 +227,40 @@
         },
         {
             "name": "behat/mink-browserkit-driver",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
-                "url": "git://github.com/Behat/MinkBrowserKitDriver.git",
-                "reference": "v1.0.0"
+                "url": "https://github.com/Behat/MinkBrowserKitDriver.git",
+                "reference": "v1.0.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/Behat/MinkBrowserKitDriver/zipball/v1.0.0",
-                "reference": "v1.0.0",
+                "url": "https://api.github.com/repos/Behat/MinkBrowserKitDriver/zipball/v1.0.1",
+                "reference": "v1.0.1",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.1",
-                "symfony/browser-kit": ">=2.0.0,<2.2.0-dev",
-                "symfony/dom-crawler": ">=2.0.0,<2.2.0-dev"
+                "behat/mink": ">=1.4,<1.5-dev",
+                "symfony/browser-kit": ">=2.0,<2.3-dev",
+                "symfony/dom-crawler": ">=2.0,<2.3-dev"
             },
-            "time": "2012-06-14 06:23:48",
+            "require-dev": {
+                "silex/silex": "@dev"
+            },
+            "time": "2013-02-13 19:56:29",
             "type": "mink-driver",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "Behat\\Mink\\Driver": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -266,8 +275,9 @@
             "homepage": "http://mink.behat.org/",
             "keywords": [
                 "Symfony2",
+                "testing",
                 "browser",
-                "testing"
+                "Mink"
             ]
         },
         {
@@ -468,31 +478,36 @@
         },
         {
             "name": "behat/mink-selenium2-driver",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
-                "url": "git://github.com/Behat/MinkSelenium2Driver.git",
-                "reference": "v1.0.2"
+                "url": "https://github.com/Behat/MinkSelenium2Driver.git",
+                "reference": "v1.0.3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/Behat/MinkSelenium2Driver/zipball/v1.0.2",
-                "reference": "v1.0.2",
+                "url": "https://api.github.com/repos/Behat/MinkSelenium2Driver/zipball/v1.0.3",
+                "reference": "v1.0.3",
                 "shasum": ""
             },
             "require": {
-                "behat/mink": ">=1.4.0,<1.5.0",
-                "instaclick/php-webdriver": "@dev",
-                "php": ">=5.3.1"
+                "php": ">=5.3.1",
+                "behat/mink": ">=1.4,<1.5-dev",
+                "instaclick/php-webdriver": "@dev"
             },
-            "time": "2012-07-05 01:32:03",
+            "time": "2013-02-13 19:41:59",
             "type": "mink-driver",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "Behat\\Mink\\Driver": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -501,46 +516,56 @@
                     "name": "Konstantin Kudryashov",
                     "email": "ever.zet@gmail.com",
                     "homepage": "http://everzet.com"
+                },
+                {
+                    "name": "Pete Otaqui",
+                    "email": "pete@otaqui.com",
+                    "homepage": "https://github.com/pete-otaqui"
                 }
             ],
             "description": "Selenium2 (WebDriver) driver for Mink framework",
             "homepage": "http://mink.behat.org/",
             "keywords": [
-                "ajax",
-                "browser",
                 "javascript",
-                "selenium",
                 "testing",
+                "browser",
+                "ajax",
+                "selenium",
                 "webdriver"
             ]
         },
         {
             "name": "behat/mink-zombie-driver",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
-                "url": "git://github.com/Behat/MinkZombieDriver.git",
-                "reference": "v1.0.0"
+                "url": "https://github.com/Behat/MinkZombieDriver.git",
+                "reference": "v1.0.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/Behat/MinkZombieDriver/zipball/v1.0.0",
-                "reference": "v1.0.0",
+                "url": "https://api.github.com/repos/Behat/MinkZombieDriver/zipball/v1.0.1",
+                "reference": "v1.0.1",
                 "shasum": ""
             },
             "require": {
-                "behat/mink": ">=1.4.0,<1.5.0-dev",
                 "php": ">=5.3.1",
-                "symfony/process": ">=2.1.0,<2.2.0-dev"
+                "behat/mink": ">=1.4,<1.5-dev",
+                "symfony/process": ">=2.1,<2.3-dev"
             },
-            "time": "2012-06-18 13:15:02",
+            "time": "2013-02-13 19:43:17",
             "type": "mink-driver",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "Behat\\Mink\\Driver": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -549,16 +574,21 @@
                     "name": "Konstantin Kudryashov",
                     "email": "ever.zet@gmail.com",
                     "homepage": "http://everzet.com"
+                },
+                {
+                    "name": "Pascal Cremer",
+                    "email": "b00gizm@gmail.com",
+                    "homepage": "http://github.com/b00gizm"
                 }
             ],
             "description": "Zombie.js driver for Mink framework",
             "homepage": "http://mink.behat.org/",
             "keywords": [
-                "ajax",
-                "browser",
-                "headless",
                 "javascript",
                 "testing",
+                "browser",
+                "ajax",
+                "headless",
                 "zombie"
             ]
         },
@@ -1281,6 +1311,37 @@
             "keywords": [
                 "mock",
                 "xunit"
+            ]
+        },
+        {
+            "name": "polycademy/citemplating",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Polycademy/CiTemplating.git",
+                "reference": "1.0.2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Polycademy/CiTemplating/zipball/1.0.2",
+                "reference": "1.0.2",
+                "shasum": ""
+            },
+            "time": "2013-02-17 07:04:26",
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "http://packagist.org/downloads/",
+            "license": [
+                "WTFPL"
+            ],
+            "description": "Simple Templating Static Helper Class for Codeigniter Provides Partials and Layouts - Convention over configuration",
+            "keywords": [
+                "templating",
+                "codeigniter"
             ]
         },
         {
