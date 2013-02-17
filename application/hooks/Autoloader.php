@@ -27,7 +27,7 @@ class Autoloader{
         $library_path = APPPATH . 'libraries/';
         $third_party_path = APPPATH . 'third_party/';
  
-        //remove the first ns (\) since libraries already have it
+        //remove the first ns (\) since library_path already has it
  
         $class = ltrim($class, '\\');
         $file  = '';

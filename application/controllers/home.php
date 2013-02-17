@@ -41,11 +41,11 @@ class Home extends CI_Controller {
 				'footer_message' => 'THIS IS A FOOTER MESSAGE',
 			),
 			'row_data' => array(
-				0 => array(
+				array(
 					'name' => 'fgfdh',
 					'id' => 'More rows to loop!'
 				),
-				1 => array(
+				array(
 					'name' => 'fgfdh',
 					'id' => 'More rows to loop!'
 				),
@@ -53,6 +53,13 @@ class Home extends CI_Controller {
 		);
 		
 		Template::compose('table', $view_data);
+	
+	}
+	
+	public function test_interface(){
+	
+		$armor = new Armor();
+		$armor->weight();
 	
 	}
 	
