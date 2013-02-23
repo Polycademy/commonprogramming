@@ -1,5 +1,7 @@
 <?php
 
+use Guzzle\Url\Mapper;
+
 class Home extends CI_Controller {
 
 	public function index(){
@@ -61,6 +63,12 @@ class Home extends CI_Controller {
 		$armor = new Armor();
 		$armor->weight();
 	
+	}
+	
+	public function test_namespace(){
+	
+		$mapper = new Mapper();
+		
 	}
 	
 }
