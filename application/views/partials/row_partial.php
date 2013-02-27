@@ -1,4 +1,4 @@
 <tr>
-	<td><?= $row['name'] ?></td>
+	<td><strong><?= $row['name'] ?></strong></td>
 	<td><?= $row['id'] ?></td>
 </tr>

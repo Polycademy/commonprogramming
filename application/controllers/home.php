@@ -49,7 +49,7 @@ class Home extends CI_Controller {
 				),
 				array(
 					'name' => 'fgfdh',
-					'id' => 'More rows to loop!'
+					'id' => 'Yay another loop!'
 				),
 			),
 		);
