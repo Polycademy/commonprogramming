@@ -71,6 +71,16 @@ class Home extends CI_Controller {
 		
 	}
 	
+	public function test_ioc(){
+	
+		$ioc = $this->config->item('ioc');
+		
+		$masterlibrary = $ioc['MasterLibrary'];
+		
+		$masterlibrary->do_something();
+		
+	}
+	
 }
 
 /* End of file welcome.php */
