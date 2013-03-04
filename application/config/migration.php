@@ -35,7 +35,7 @@
 | and disable it back when you're done.
 |
 */
-$config['migration_enabled'] = FALSE;
+$config['migration_enabled'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,7 +53,7 @@ $config['migration_enabled'] = FALSE;
 | to 'sequential' for backward compatibility.
 |
 */
-$config['migration_type'] = 'timestamp';
+$config['migration_type'] = 'sequential';
 
 /*
 |--------------------------------------------------------------------------
