@@ -64,6 +64,12 @@
 |
 */
 
+Pigeon::map(function($r){
+	$r->resources('posts');
+});
+
+$route = Pigeon::draw();
+
 $route['default_controller'] = 'home';
 $route['404_override'] = '';
 

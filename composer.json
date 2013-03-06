@@ -12,7 +12,8 @@
         "phing/phing": "2.4.13",
         "leafo/lessphp": "0.3.8",
 		"pimple/pimple": "*",
-		"polycademy/citemplating": "*"
+		"polycademy/citemplating": "*",
+		"jamierumbelow/pigeon": "*"
     },
     "config": {
         "bin-dir": "bin/"
