@@ -65,7 +65,15 @@
 */
 
 Pigeon::map(function($r){
+
 	$r->resources('posts');
+	
+	//SESSION ROUTES
+	$r->get('sessions/new', 'user_sessions/login_form');
+	$r->post('sessions', 'user_sessions/login');
+	//$r->delete('sessions/(:any)', 'user_sessions/logout/$1');
+	$r->get('sessions/logout', 'user_sessions/logout');
+
 });
 
 $route = Pigeon::draw();
