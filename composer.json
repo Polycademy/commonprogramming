@@ -13,7 +13,8 @@
         "leafo/lessphp": "0.3.8",
 		"pimple/pimple": "*",
 		"polycademy/citemplating": "*",
-		"jamierumbelow/pigeon": "*"
+		"jamierumbelow/pigeon": "*",
+		"firephp/firephp-core": "dev-master"
     },
     "config": {
         "bin-dir": "bin/"

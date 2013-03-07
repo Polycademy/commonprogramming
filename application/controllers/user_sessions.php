@@ -66,7 +66,9 @@ class User_sessions extends CI_Controller{
 		}else{
 		
 			//validation not successful
-			$this->session->set_flashdata('message', validation_errors());
+			$errors = trim(validation_errors()); //there's a bug in set_flashdata which dies when there's newline whitespace, we're just trimming it here to prevent any errors
+			$this->session->set_flashdata('message', $errors);
+			
 			redirect($this->input->server('HTTP_REFERER'));
 			
 		}
