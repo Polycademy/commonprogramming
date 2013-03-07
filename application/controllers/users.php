@@ -57,8 +57,10 @@ class Users extends CI_Controller{
 		}else{
 
 			$this->view_data += array(
-			
+				'validation_errors' => validation_errors(),
 			);
+			
+			Template::compose('create_new', $this->view_data);
 		
 		}
 		
