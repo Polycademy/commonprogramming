@@ -72,7 +72,7 @@ Pigeon::map(function($r){
 	$r->get('sessions/new', 'user_sessions/login_form');
 	$r->post('sessions', 'user_sessions/login');
 	//$r->delete('sessions/(:any)', 'user_sessions/logout/$1');
-	$r->get('sessions/logout', 'user_sessions/logout');
+	$r->get('sessions/logout', 'user_sessions/logout'); //FALLBACK BECAUSE WE DONT HAVE AJAX YET
 
 });
 
