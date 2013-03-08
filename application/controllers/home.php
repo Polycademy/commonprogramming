@@ -5,6 +5,11 @@ use Guzzle\Url\Mapper;
 class Home extends CI_Controller {
 
 	public function index(){
+	
+		$some_dynamic_variable = array('fgdfg', 'fdgdfgf');
+		FB::log($some_dynamic_variable);
+		FB::warn('Hey this is a warning!', 'Hey this is warning watch out!');
+		FB::info('This is an information', 'BLAHBLHABLAH');
         
         $view_data = array(
 			'header' => array(
@@ -22,6 +27,8 @@ class Home extends CI_Controller {
 	
 	public function json(){
 	
+		var_dump($this->input->server('HTTP_ACCEPT'));
+	
 		$view_data = array(
 			0	=> array(
 				'line'		=> false,
@@ -29,7 +36,7 @@ class Home extends CI_Controller {
 			),
 		);
 		
-		Template::compose(false, $view_data, 'json');
+		//Template::compose(false, $view_data, 'json');
 	
 	}
 	
@@ -136,6 +143,17 @@ class Home extends CI_Controller {
 		//$lol = popen('cd', 'r');
 		//var_dump(stream_get_contents($lol));
 		//pclose($lol);
+	
+	}
+	
+	public function test_spark(){
+	
+		$this->load->spark('restclient/2.1.0');
+		$this->load->library('rest');
+		$this->rest->initialize(array('server' => 'http://pipes.yahoo.com/'));
+		$tweets = $this->rest->get('pipes/pipe.run?_id=24a7ee6208f281f8dff1162dbac57584&_render=rss');
+		
+		var_dump($tweets);
 	
 	}
 	

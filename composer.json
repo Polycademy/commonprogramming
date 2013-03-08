@@ -14,7 +14,8 @@
 		"pimple/pimple": "*",
 		"polycademy/citemplating": "*",
 		"jamierumbelow/pigeon": "*",
-		"firephp/firephp-core": "dev-master"
+		"firephp/firephp-core": "dev-master",
+		"hybridauth/hybridauth": "dev-master"
     },
     "config": {
         "bin-dir": "bin/"
