@@ -101,25 +101,25 @@ class Home extends CI_Controller {
 
 		if(is_resource($process)){
 
-		while(!feof($pipes[1])){
-			$output = fgets($pipes[1]);
-			echo $output;
-			ob_flush();
-			flush();
-		}
+			while(!feof($pipes[1])){
+				$output = fgets($pipes[1]);
+				echo $output;
+				ob_flush();
+				flush();
+			}
+			
+			// while (($output = fgets($pipes[1], 4096)) !== false) {
+				// echo $output;
+				// ob_flush();
+				// flush();
+			// }
 
-		while (($output = fgets($pipes[1], 4096)) !== false) {
-			echo $output;
-			ob_flush();
-			flush();
-		}
+			fclose($pipes[1]);
 
-		fclose($pipes[1]);
+			$errors = stream_get_contents($pipes[2]);
+			fclose($pipes[2]);
 
-		$errors = stream_get_contents($pipes[2]);
-		fclose($pipes[2]);
-
-		$exit_code = proc_close($process);
+			$exit_code = proc_close($process);
 
 		}
 	
@@ -129,7 +129,7 @@ class Home extends CI_Controller {
 	
 		// function execInBackground($cmd) {
 			// if (substr(php_uname(), 0, 7) == "Windows"){
-				// pclose(popen("start /B ". $cmd . ' > D:/wamp/www/dirlist.txt', "r")); 
+				// pclose(popen("start /B ". $cmd . ' > C:/wamp/www/dirlist.txt', "r")); 
 				// echo 'lol';
 			// }
 			// else {
@@ -139,10 +139,6 @@ class Home extends CI_Controller {
 		// } 
 		
 		// execInBackground('tracert -w 10 accettura.com');
-		
-		//$lol = popen('cd', 'r');
-		//var_dump(stream_get_contents($lol));
-		//pclose($lol);
 	
 	}
 	
