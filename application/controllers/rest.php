@@ -23,27 +23,41 @@ class Rest extends CI_Controller{
 		
 		$query = $this->Rest_model->read_all($limit, $offset);
 		
-		Template::compose(false, $query, 'json');
-		
-		/*
 		if($query){
-			foreach($query as &$course){
-				$course = output_message_mapper($course);
+		
+			foreach($query as &$row){
+				$row = output_message_mapper($row);
 			}
+			
 			$output = $query;
+			
 		}else{
+		
 			$this->output->set_status_header('404');
+			
+			/*
 			$output = array(
-				'error'			=> output_message_mapper($this->Courses_model->get_errors()),
+				'error'			=> output_message_mapper($this->Rest_model->get_errors()),
 			);
+			*/
+			
+			$output = array(
+				'error'	=> 'OH NO SOMETHIng WENT WROng'
+			);
+			
 		}
-		*/
 		
 		
-	
+		
+		Template::compose(false, $output, 'json');
+		
 	}
 	
-	public function show($id){}
+	public function show($id){
+	
+	
+	
+	}
 	public function create(){}
 	public function update($id){}
 	public function delete($id){}

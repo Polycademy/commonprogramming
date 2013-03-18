@@ -49,7 +49,7 @@ class Rest_model extends CI_Model{
 			$data[] = array(
 				'id'	=> $row['id'],
 				'name'	=> $row['name'],
-				'power'	=> $row['power'],
+				'power_magic'	=> $row['power'],
 			);
 		
 		}
