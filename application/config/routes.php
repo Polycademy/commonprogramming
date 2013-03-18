@@ -66,6 +66,10 @@
 
 Pigeon::map(function($r){
 
+	$r->route('api', false, function($r){
+		$r->resources('rest');
+	});
+
 	$r->resources('posts');
 	
 	//SESSION ROUTES

@@ -50,11 +50,11 @@ class Home extends CI_Controller {
 				'footer_message' => 'THIS IS A FOOTER MESSAGE',
 			),
 			'row_data' => array(
-				array(
+				0 => array(
 					'name' => 'fgfdh',
 					'id' => 'More rows to loop!'
 				),
-				array(
+				1 => array(
 					'name' => 'fgfdh',
 					'id' => 'Yay another loop!'
 				),
