@@ -86,7 +86,7 @@ if(ENVIRONMENT == 'development'){
 		'hostname' => 'localhost',
 		'username' => 'root',
 		'password' => '',
-		'database' => 'polycademy2',
+		'database' => 'commonprogramming',
 		'dbdriver' => 'mysqli',
 		'dbprefix' => '',
 		'pconnect' => TRUE,
@@ -106,6 +106,7 @@ if(ENVIRONMENT == 'development'){
 
 }elseif(ENVIRONMENT == 'production'){
 
+	//example APPFOG style
 	$services = getenv('VCAP_SERVICES');
 	$services_json = json_decode($services, true);
 	$mysql_config = $services_json['mysql-5.1'][0]['credentials'];

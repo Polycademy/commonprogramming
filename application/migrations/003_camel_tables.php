@@ -3,7 +3,7 @@
 class Migration_camel_tables extends CI_Migration {
 
 	public function up(){
-	
+		
 		$tables = $this->db->list_tables();
 		
 		foreach($tables as $table){
@@ -11,7 +11,7 @@ class Migration_camel_tables extends CI_Migration {
 			//need to detect if it's a session table, if it is, don't change it (due to its nativeness!)
 			if($table == $this->config->item('sess_table_name')){
 				continue;
-			}
+			}		
 			
 			$field_data = $this->db->field_data($table);
 			
@@ -57,7 +57,7 @@ class Migration_camel_tables extends CI_Migration {
 
 	}
 
-	public function down(){
+	public function down(){	
 	
 		$tables = $this->db->list_tables();
 		
