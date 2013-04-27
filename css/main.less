@@ -1,0 +1,460 @@
+/* ==========================================================================
+   IMPORT MIXINS ELEMENTS PRESETS
+   ========================================================================== */
+@import url("bootstrap.less");
+@import url("markitup.less");
+@import url("disqus.less");
+@import url("liquidslider.less");
+@import url("angular-ui.less");
+
+/* Code Mirror Themes */
+@import url("codemirror/codemirror.less");
+@import url("codemirror/rubyblue.less");
+
+/* ==========================================================================
+   FONTS
+   ========================================================================== */
+
+@font-face {
+    font-family: 'avantgarde_bk_btdemi';
+    src: url('../fonts/avantgarde_bk_bt_demi/avgardd-webfont.eot');
+    src: url('../fonts/avantgarde_bk_bt_demi/avgardd-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/avantgarde_bk_bt_demi/avgardd-webfont.woff') format('woff'),
+         url('../fonts/avantgarde_bk_bt_demi/avgardd-webfont.ttf') format('truetype'),
+         url('../fonts/avantgarde_bk_bt_demi/avgardd-webfont.svg#avantgarde_bk_btdemi') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'avantgarde_bk_btbook';
+    src: url('../fonts/avantgarde_bk_bt_book/avgardn-webfont.eot');
+    src: url('../fonts/avantgarde_bk_bt_book/avgardn-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/avantgarde_bk_bt_book/avgardn-webfont.woff') format('woff'),
+         url('../fonts/avantgarde_bk_bt_book/avgardn-webfont.ttf') format('truetype'),
+         url('../fonts/avantgarde_bk_bt_book/avgardn-webfont.svg#avantgarde_bk_btbook') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'avantgarde_bk_btbook_oblique';
+    src: url('../fonts/avantgarde_bk_bt_oblique/avgardni-webfont.eot');
+    src: url('../fonts/avantgarde_bk_bt_oblique/avgardni-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/avantgarde_bk_bt_oblique/avgardni-webfont.woff') format('woff'),
+         url('../fonts/avantgarde_bk_bt_oblique/avgardni-webfont.ttf') format('truetype'),
+         url('../fonts/avantgarde_bk_bt_oblique/avgardni-webfont.svg#avantgarde_bk_btbook_oblique') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'code_pro_demoregular';
+    src: url('../fonts/code_pro_demo/code_pro_demo-webfont.eot');
+    src: url('../fonts/code_pro_demo/code_pro_demo-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/code_pro_demo/code_pro_demo-webfont.woff') format('woff'),
+         url('../fonts/code_pro_demo/code_pro_demo-webfont.ttf') format('truetype'),
+         url('../fonts/code_pro_demo/code_pro_demo-webfont.svg#code_pro_demoregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* ==========================================================================
+   VARIABLES
+   ========================================================================== */
+@container_padding: 1.2%;
+@grid_margins: 2.4%;
+@heading_margins: 1.9%;
+@responsive_slider_max_width: 1200px;
+@slider_arrow_margin: 1.2%;
+@team_icon_width: 72px;
+@team_icon_height: 72px;
+/* Blog */
+@black_text_color: #313131;
+@content_separation_height: 25px;
+
+/* ==========================================================================
+   MIXINS
+   ========================================================================== */
+
+.outline_transition (@original_color, @duration, @function, @size, @type, @final_colour, @offset){
+	outline: @original_color;
+	-webkit-transition: outline @duration @function;
+	-moz-transition: outline @duration @function;
+	-ms-transition: outline @duration @function;
+	-o-transition: outline @duration @function;
+	transition: outline @duration @function;
+	&:hover{
+		outline: @size @type @final_colour;
+		outline-offset: @offset;
+	}
+}
+
+.border_radius(@radius){
+	-webkit-border-radius: @radius;
+	-moz-border-radius: @radius;
+	border-radius: @radius;
+}
+
+.border_image(@url, @width, @style){
+	-moz-border-image: url(@url) @width @style;
+	-webkit-border-image: url(@url) @width @style;
+	-o-border-image: url(@url) @width @style;
+	border-image: url(@url) @width @style;
+}
+
+/* ==========================================================================
+   H STYLES
+   ========================================================================== */
+h1{
+	font-size: 42px;
+	text-align: center;
+	margin: @heading_margins auto;
+    -webkit-font-smoothing: antialiased;
+	a:hover{
+		text-decoration: none;
+	}
+}
+
+/* For large section headers */
+h2{
+	font-family: 'avantgarde_bk_btdemi';
+	font-size: 28px;
+	text-align: center;
+	line-height: normal;
+	font-weight: lighter;
+	margin: @heading_margins auto;
+    -webkit-font-smoothing: antialiased;
+	a:hover{
+		text-decoration: none;
+	}
+}
+
+/* For Panel or Box Headers */
+h3{
+	font-family: 'code_pro_demoregular';
+	font-size: 40px;
+	text-align: center;
+	font-weight: lighter;
+	line-height: normal;
+	margin: 0;
+    -webkit-font-smoothing: antialiased;
+	a:hover{
+		text-decoration: none;
+	}
+}
+
+/* For slogans after the h2 */
+h4{
+	font-family: 'avantgarde_bk_btbook_oblique';
+	font-size: 25px;
+	text-align: center;
+	font-weight: lighter;
+	line-height: normal;
+	margin: @heading_margins auto;
+	-webkit-font-smoothing: antialiased;
+	a:hover{
+		text-decoration: none;
+	}
+}
+
+/* For headers on small details */
+h5{
+	font-family: 'avantgarde_bk_btdemi';
+	font-size: 18px;
+	text-align: center;
+	font-weight: lighter;
+	line-height: normal;
+	margin: 14px auto auto auto;
+	-webkit-font-smoothing: antialiased;
+	a:hover{
+		text-decoration: none;
+	}
+}
+
+/* ==========================================================================
+   CONTAINERS
+   ========================================================================== */
+body{
+	font-family: arial, sans-serif;
+}
+
+.container{
+	padding: @container_padding;
+}
+
+.blue_container{
+	background: url('../img/main_article_bg.png');
+	border-top: 2px solid #074e64;
+	border-bottom: 1px solid #02223a;
+	color: #fff;
+	.blue_text_container{
+		border: 1px solid #08497a;
+	}
+}
+
+.red_container{
+	background: url('../img/team_location_bg.png');
+	border-top: 1px solid #02223a;
+	border-bottom: 2px solid #c87173;
+	color: #fff;
+	.red_text_container{
+		border: 1px solid #b62b2f;
+	}
+}
+
+.white_container{
+	background: url('../img/white_container_bg.png');
+	color: @black_text_color;
+	border-top: 2px solid #AFAFAF;
+	border-bottom: 2px solid #AFAFAF;
+}
+
+.blue_text_container{
+	background: url('../img/another_bg.png');
+	padding: 20px;
+}
+
+.red_text_container{
+	background: url('../img/team_location_panel_bg.png') repeat;
+	padding: 20px;
+}
+
+.white_text_container{
+	background: #f5f5f5;
+	margin: 20px 10%;
+	border: 9px solid #e3e3e3;	
+	.border_image('../img/white_text_container_border.png', 9, repeat);
+}
+
+/* ==========================================================================
+   FORM STYLES
+   ========================================================================== */
+.form-actions{
+	background: none;
+	border: none;
+}
+
+/* ==========================================================================
+   PAGINATION
+   ========================================================================== */
+.pagination ul{
+	border: 1px solid #C7C7C7;
+}
+
+.pagination-large ul > li > a, .pagination-large ul > li > span {
+    font-size: 17.5px;
+    padding: 5px 17px;
+}
+
+.pager li a{
+	border: 4px solid #DDDDDD;
+}
+
+/* ==========================================================================
+   AJAX LOADER
+   ========================================================================== */
+.ajax_loader{
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	z-index: 10000;
+	background: rgba(70, 70, 70, 0.2) url(../img/ajax_loader.png) no-repeat center center;
+	display: none;
+}
+
+/* ==========================================================================
+   HTTP STATUS MESSAGES
+   ========================================================================== */
+.http_messages{
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	margin: 0 auto;
+	width: 40%;
+	background: rgba(17, 232, 247, 0.5);
+	z-index: 9999;
+	padding: 10px;
+	&:empty{
+		/* display: none; */
+	}
+	.http_message{
+		display: block;
+		text-align: center;
+		color: #5F6060;
+	}
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+[ng-cloak], .ng-cloak {
+	display: none !important; /* Cloaking the body so there's no flicker! */
+}
+
+header.navbar{
+	background-image: url('../img/header_footer_bg.jpg');
+	margin: 0;
+	div.navbar-inner{
+		background: transparent;
+		filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+		border: none;
+		box-shadow: none;
+		padding: auto;
+	}
+	.logo{
+		float: left;
+		margin: 35px 0 34px;
+	}
+	.slogan{
+		font-family: "avantgarde_bk_btbook";
+		color: #e31e24;
+		font-size: 15px;
+		float: right;
+		margin: 30px 12px 12px 0;
+	}
+	.btn-navbar{
+		width: 18px;
+		height: 13px;
+		float: right;
+		clear: right;
+		margin: 6px 12px 0 0;
+	}
+	.nav{
+		font-family: arial;
+		font-size: 18px;
+		float: right;
+		clear: right;
+		margin: 0;
+		li > a{
+			color: #6c6c6c;
+			text-shadow: none;
+			padding: 10px 2px;
+		}
+	}
+	.divider-vertical{
+		border-left: 1px solid #6c6c6c;
+		border-right: none;
+		height: 18px;
+		margin: 12px 6px;
+	}
+}
+
+/* ==========================================================================
+   ACTION GRID
+   ========================================================================== */
+.action_grid{
+	margin-top: @grid_margins;
+	margin-bottom: @grid_margins;
+	section > div.grid_box{
+		border: 2px solid #09405d;
+		overflow: hidden;
+	}
+	.grid_box > div.row-fluid{
+		margin: 0 0 24px 0;
+	}
+	h3{
+		margin: 24px 0px 6px 0px;
+		a{
+			color: #fff;
+			font-weight: lighter;
+			&:hover{
+				color: #d4d4d4;
+			}
+		}
+	}
+	img{
+		margin: 26px auto;
+		display: block;
+		padding: 0 10px;
+	}
+	p{
+		font-family: "avantgarde_bk_btbook";
+		font-size: 17px;
+		line-height: 19px;
+		font-weight: normal;
+		margin: 8px 14px 14px 7px;
+	}
+	.envision_panel{
+		background: #c41f2c ;
+	}
+
+	.build_panel{
+		background: #0f68a8;
+	}
+
+	.deploy_panel{
+		background: #848b12;
+	}
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+footer{
+	background: url('../img/header_footer_bg.jpg') repeat;
+	.footer_links{
+		margin: 0;
+		li{
+			float: left;
+			font-size: 12px;
+			list-style-type: none;
+			margin: 0 10px;
+		}
+	}
+	.copyright{
+		float: right;
+		font-size: 10px;
+		color: #373737;
+		font-style: italic;
+	}
+	.footer_grid{
+		margin-top: @grid_margins;
+		margin-bottom: @grid_margins;
+	}
+	.footer_grid section{
+		h3{
+			margin-bottom: 8px;
+			color: #6c6c6c;
+		}
+		p{
+			padding: 20px;
+			border: 1px solid #b0b0b0;
+			color: #373737;
+		}
+		em.footer_dates{
+			font-size: 12px;
+		}
+	}
+}
+
+.multiplebgs{
+	footer{
+		section.blog_panel > p{
+			background: url('../img/blog_commentbg.png') no-repeat bottom right, url('../img/footer_panel_bg.png') repeat;
+		}
+		section.fbtwitter_panel > p{
+			background: url('../img/social_mediabg.png') no-repeat bottom right, url('../img/footer_panel_bg.png') repeat;
+		}
+		section.notices_panel > p{
+			background: url('../img/notices_exclaimbg.png') no-repeat bottom right, url('../img/footer_panel_bg.png') repeat;
+		}
+	}
+}
+
+.no-multiplebgs{
+	footer{
+		section > p{
+			background: url('../img/footer_panel_bg.png') repeat;
+		}
+	}
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@import url("bootstrap-responsive.less");
+@import url("responsive.less");

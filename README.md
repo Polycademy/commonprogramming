@@ -1,4 +1,4 @@
-commonprogramming
+Common Programming
 =================
 
-Demo of common web programming
+Common Programming Seed for Polycademy

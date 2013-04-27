@@ -1,5 +1,6 @@
 <?php
 
+//for IOC demonstration
 class MasterLibrary{
 
 	private $dependent;

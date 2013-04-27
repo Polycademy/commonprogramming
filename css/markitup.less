@@ -1,0 +1,161 @@
+/* ==========================================================================
+   MARKITUP STYLES
+   ========================================================================== */
+.markItUp{
+	border: 1px solid #CCCCCC;
+	.border_radius(4px);
+	*{
+		margin:0px; padding:0px;
+		outline:none;
+	}
+	.markItUpButton1 a {
+		background-image:url(../img/h1.png); 
+	}
+	.markItUpButton2 a {
+		background-image:url(../img/h2.png); 
+	}
+	.markItUpButton3 a {
+		background-image:url(../img/h3.png); 
+	}
+	.markItUpButton4 a {
+		background-image:url(../img/h4.png); 
+	}
+	.markItUpButton5 a {
+		background-image:url(../img/h5.png); 
+	}
+	.markItUpButton6 a {
+		background-image:url(../img/h6.png); 
+	}
+	.markItUpButton7 a {
+		background-image:url(../img/paragraph.png); 
+	}
+	.markItUpButton8 a {
+		background-image:url(../img/bold.png);
+	}
+	.markItUpButton9 a {
+		background-image:url(../img/italic.png);
+	}
+	.markItUpButton10 a {
+		background-image:url(../img/stroke.png);
+	}
+	.markItUpButton11 a {
+		background-image:url(../img/list-bullet.png);
+	}
+	.markItUpButton12 a {
+		background-image:url(../img/list-numeric.png);
+	}
+	.markItUpButton13 a {
+		background-image:url(../img/list-item.png);
+	}
+	.markItUpButton14 a {
+		background-image:url(../img/picture.png); 
+	}
+	.markItUpButton15 a {
+		background-image:url(../img/link.png);
+	}
+	.clean_markitup a {
+		background-image:url(../img/clean.png);
+	}
+	.preview_markitup a {
+		background-image:url(../img/preview.png);
+	}
+	.markItUpContainer  {
+		background:#FFF url(../img/bg-container.png) repeat-x top left;
+		padding:5px 5px 2px 5px;
+	}
+	.markItUpHeader{
+		/* first row of buttons */
+		ul{
+			li{
+				list-style:none;
+				float:left;
+				position:relative;
+				&:hover > ul{
+					display:block;
+				}
+				ul{
+					display:none;
+				}
+			}
+			a {
+				display:block;
+				width:16px; height:16px;
+				text-indent:-10000px;
+				background-repeat:no-repeat;
+				padding:3px;
+				margin:0px;
+			}
+			.markItUpSeparator {
+				margin:0 10px;
+				width:1px;
+				height:16px;
+				overflow:hidden;
+				background-color:#CCC;
+			}
+			.markItUpDropMenu {
+				background:transparent url(../img/menu.png) no-repeat 115% 50%;
+				margin-right:5px;
+				li{
+					margin-right:0px;
+				}
+			}
+			/* next rows of buttons */
+			ul{
+				display:none;
+				position:absolute;
+				top:18px; left:0px;	
+				background:#F5F5F5;
+				border:1px solid #3C769D;
+				height:inherit;
+				li {
+					float:none;
+					border-bottom:1px solid #3C769D;
+				}
+				a {
+					display:block;
+					padding-left:0px;
+					text-indent:0;
+					width:120px; 
+					padding:5px 5px 5px 25px;
+					background-position:2px 50%;
+					&:hover{
+						color:#FFF;
+						background-color:#3C769D;
+					}
+				}
+				.markItUpSeparator {
+					width:auto; height:1px;
+					margin:0px;
+				}
+				.markItUpDropMenu {
+					background:#F5F5F5 url(../img/submenu.png) no-repeat 100% 50%;
+				}
+				/* next rows of buttons */
+				ul {
+					position:absolute;
+					top:-1px; left:150px;
+					li {
+						float:none;
+					}
+				}
+			}
+		}
+	}
+	.markItUpEditor {
+		padding:5px;
+		clear:both;
+		overflow:auto;
+	}
+	.markItUpFooter {
+		width:100%;
+		cursor:n-resize;
+	}
+	.markItUpResizeHandle {
+		overflow:hidden;
+		width:22px; height:5px;
+		margin-left:auto;
+		margin-right:auto;
+		background-image:url(../img/handle.png);
+		cursor:n-resize;
+	}
+}

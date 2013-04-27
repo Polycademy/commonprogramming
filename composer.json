@@ -9,15 +9,22 @@
         "behat/mink-sahi-driver": "*",
         "behat/mink-zombie-driver": "*",
         "phpunit/phpunit": "3.7.*",
-        "phing/phing": "2.4.13",
+		"cboden/Ratchet": "*",
+		"react/zmq": "dev-master",
         "leafo/lessphp": "0.3.8",
 		"pimple/pimple": "*",
 		"polycademy/citemplating": "*",
 		"jamierumbelow/pigeon": "*",
 		"firephp/firephp-core": "dev-master",
-		"hybridauth/hybridauth": "dev-master"
-    },
+		"hybridauth/hybridauth": "dev-master",
+		"polycademy/validation": "*"
+	},
     "config": {
         "bin-dir": "bin/"
-    }
+    },
+	"autoload": {
+		"psr-0": {
+			"PolycademyRealtime": "application_ws"
+		}
+	}
 }

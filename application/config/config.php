@@ -39,7 +39,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= '';
+$config['base_url'] = '';
 
 /*
 |--------------------------------------------------------------------------
@@ -211,7 +211,7 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 0;
+$config['log_threshold'] = (ENVIRONMENT == 'development') ? 3 : 0;
 
 /*
 |--------------------------------------------------------------------------
@@ -272,7 +272,7 @@ $config['cache_path'] = '';
 | http://codeigniter.com/user_guide/libraries/sessions.html
 |
 */
-$config['encryption_key'] = 'LKN&GC*D()DE#CR&F(S!LCN$F*SJF$';
+$config['encryption_key'] = '1nddk8)(&%#GCN,.&@JD41c89035fc34';
 
 /*
 |--------------------------------------------------------------------------
@@ -300,8 +300,8 @@ $config['sess_valid_drivers']	= array();
 $config['sess_cookie_name']		= 'session';
 $config['sess_expiration']		= 7200;
 $config['sess_expire_on_close']	= FALSE;
-$config['sess_encrypt_cookie']	= TRUE; //of course we want to encrypt it
-$config['sess_use_database']	= FALSE; //no we're going to use ionauth
+$config['sess_encrypt_cookie']	= TRUE;
+$config['sess_use_database']	= TRUE; //switch this off and run the migration first, then switch back on!
 $config['sess_table_name']		= 'sessions';
 $config['sess_match_ip']		= FALSE;
 $config['sess_match_useragent']	= TRUE;
@@ -319,7 +319,7 @@ $config['sess_time_to_update']	= 300;
 | 'cookie_httponly' = Cookie will only be accessible via HTTP(S) (no javascript)
 |
 */
-$config['cookie_prefix']	= 'commonprogramming_';
+$config['cookie_prefix']	= 'polycademy2_';
 $config['cookie_domain']	= '';
 $config['cookie_path']		= '/';
 $config['cookie_secure']	= FALSE;
@@ -350,9 +350,9 @@ $config['global_xss_filtering'] = FALSE;
 | 'csrf_regenerate' = Regenerate token on every submission
 | 'csrf_exclude_uris' = Array of URIs which ignore CSRF checks
 */
-$config['csrf_protection'] = FALSE;
-$config['csrf_token_name'] = 'csrf_test_name';
-$config['csrf_cookie_name'] = 'csrf_cookie_name';
+$config['csrf_protection'] = TRUE; //SWIITCH BACK ON WHEN YOU ARE READY
+$config['csrf_token_name'] = 'csrf_token';
+$config['csrf_cookie_name'] = 'csrf_cookie';
 $config['csrf_expire'] = 7200;
 $config['csrf_regenerate'] = TRUE;
 $config['csrf_exclude_uris'] = array();

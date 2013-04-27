@@ -4,21 +4,16 @@
 if(!function_exists('output_message_mapper')){
 	function output_message_mapper($messages, $prefix = ''){
 	
-		$array = array_flip($messages);
-		
-		array_walk(
-			$array,
-			function(&$value, $key, $prefix){
-				//add in prefix
-				//snake to camel!
-				$value = (!empty($prefix)) ? camelize($prefix . '_' . $value) : camelize($value);
-			},
-			$prefix
-		);
-		
-		$array = array_flip($array);
+	
+		foreach($messages as $key => $value){
 
-		return $array;
+			$key = (!empty($prefix)) ? camelize($prefix . '_' . $key) : camelize($key);
+			
+			$new_messages[$key] = $value;
+			
+		}
+
+		return $new_messages;
 		
 	}
 }
@@ -27,30 +22,22 @@ if(!function_exists('output_message_mapper')){
 //camel to snake!
 if(!function_exists('input_message_mapper')){
 	function input_message_mapper($messages, $prefix = ''){
-	
-		$array = array_flip($messages);
 		
-		array_walk(
-			$array,
-			function(&$value, $key, $prefix){
-			
-				//remove the prefix, if it exists
-				if(!empty($prefix)){
-					if(substr($value, 0, strlen($prefix)) == $prefix){
-						$value = substr($value, strlen($prefix), strlen($value));
-					}
+		foreach($messages as $key => $value){
+		
+			if(!empty($prefix)){
+				if(substr($key, 0, strlen($prefix)) == $prefix){
+					$key = substr($key, strlen($prefix), strlen($key));
 				}
-				
-				//then camel to snake!
-				$value = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $value));
+			}
 			
-			},
-			$prefix
-		);
-		
-		$array = array_flip($array);
+			$key = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $key));
+			
+			$new_messages[$key] = $value;
+			
+		}
 
-		return $array;
+		return $new_messages;
 		
 	}
 }

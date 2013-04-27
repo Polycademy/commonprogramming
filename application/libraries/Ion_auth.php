@@ -81,7 +81,7 @@ class Ion_auth
 		$this->_cache_user_in_group =& $this->ion_auth_model->_cache_user_in_group;
 
 		//auto-login the user if they are remembered
-		if (!$this->logged_in() && get_cookie('identity') && get_cookie('remember_code'))
+		if (!$this->logged_in() && get_cookie('identity') && get_cookie('rememberCode'))
 		{
 			$this->ion_auth_model->login_remembered_user();
 		}
@@ -146,7 +146,7 @@ class Ion_auth
 			{
 				$data = array(
 					'identity'		=> $user->{$this->config->item('identity', 'ion_auth')},
-					'forgotten_password_code' => $user->forgotten_password_code
+					'forgottenPasswordCode' => $user->forgotten_password_code
 				);
 
 				if(!$this->config->item('use_ci_email', 'ion_auth'))
@@ -199,7 +199,7 @@ class Ion_auth
 		$this->ion_auth_model->trigger_events('pre_password_change');
 
 		$identity = $this->config->item('identity', 'ion_auth');
-		$profile  = $this->where('forgotten_password_code', $code)->users()->row(); //pass the code to profile
+		$profile  = $this->where('forgottenPasswordCode', $code)->users()->row(); //pass the code to profile
 
 		if (!$profile)
 		{
@@ -260,7 +260,7 @@ class Ion_auth
 	 **/
 	public function forgotten_password_check($code)
 	{
-		$profile = $this->where('forgotten_password_code', $code)->users()->row(); //pass the code to profile
+		$profile = $this->where('forgottenPasswordCode', $code)->users()->row(); //pass the code to profile
 
 		if (!is_object($profile))
 		{
@@ -383,16 +383,16 @@ class Ion_auth
 		$identity = $this->config->item('identity', 'ion_auth');
 		$this->session->unset_userdata($identity);
 		$this->session->unset_userdata('id');
-		$this->session->unset_userdata('user_id');
+		$this->session->unset_userdata('userId');
 
 		//delete the remember me cookies if they exist
 		if (get_cookie('identity'))
 		{
 			delete_cookie('identity');
 		}
-		if (get_cookie('remember_code'))
+		if (get_cookie('rememberCode'))
 		{
-			delete_cookie('remember_code');
+			delete_cookie('rememberCode');
 		}
 
 		//Destroy the session
@@ -431,7 +431,7 @@ class Ion_auth
 	 **/
 	public function get_user_id()
 	{
-		$user_id = $this->session->userdata('user_id');
+		$user_id = $this->session->userdata('userId');
 		if (!empty($user_id))
 		{
 			return $user_id;
@@ -465,7 +465,7 @@ class Ion_auth
 	{
 		$this->ion_auth_model->trigger_events('in_group');
 
-		$id || $id = $this->session->userdata('user_id');
+		$id || $id = $this->session->userdata('userId');
 
 		if (!is_array($check_group))
 		{

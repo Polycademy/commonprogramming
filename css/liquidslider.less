@@ -1,0 +1,103 @@
+/* ==========================================================================
+   LIQUID SLIDER (some of the settings will be overwritten by the responsive settings below
+   ========================================================================== */
+.no-js .liquid-slider {
+	height: 350px;
+	overflow: scroll;
+}
+
+.arrows .liquid-slider {
+	margin: 0 10px;
+}
+
+.liquid-slider-wrapper {
+	margin: @grid_margins auto;
+	border: 2px solid #0c436d;
+	clear: both;
+	overflow: auto;
+	position: relative;
+	.liquid-slider-preloader {
+		background: url('../img/loading.gif') transparent no-repeat center 75px;
+		opacity: .90;
+		width:100%;
+		height:200%;
+		position:absolute;
+		top:0;
+		left:0;
+	}
+	/* The responsive slider will interpret the width as the max width instead */
+	.liquid-slider {
+		background: url('../img/slider_bg.png');
+		width: @responsive_slider_max_width;
+		float: left;
+		overflow: hidden;
+		position: relative;
+	}
+	/* Panels (panels of the sections) */
+	.panel-container {
+		position: relative;
+		.fadeClass {
+			position: absolute;
+			top: 0; 
+			left: 0;
+			display: none;
+		}
+	}
+	.panel{
+		width: @responsive_slider_max_width;
+		display: block;
+		float: left;
+	}
+	/* Each panel has a panel wrapper */
+	.panel-wrapper{
+		padding: 20px;
+		position:relative;
+	}
+	/* Graphical Arrows */
+	.liquid-nav-left-arrow, .liquid-nav-right-arrow {
+		cursor: pointer;
+		float: left;
+		a{
+			display: block;
+		}
+	}
+	.liquid-nav-left, .liquid-nav-left-arrow {
+		clear: both;
+	}
+	.liquid-nav-right-arrow {
+		width: 40px;
+		height: 40px;
+		background: url(../img/arrows.png) no-repeat top right;
+		margin: @slider_arrow_margin;
+		position:relative;
+		&:hover{
+			background: url(../img/arrows.png) no-repeat bottom right;
+		}
+	}
+	.liquid-nav-left-arrow {
+		width: 40px;
+		height: 40px;
+		background: url(../img/arrows.png) no-repeat top left;
+		margin: @slider_arrow_margin;
+		position:relative;
+		&:hover{
+			background: url(../img/arrows.png) no-repeat bottom left;
+		}
+	}
+	/* Details inside the slides */
+	.slide_grid > div.row-fluid{
+		margin-top: 18px;
+	}
+	.slide_details{
+		h5{
+			text-align: left;
+		}
+		img{
+			margin: 20px auto;
+			display: block;
+		}
+		p{
+			font-size: 15px;
+		}
+	}
+}

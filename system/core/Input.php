@@ -153,17 +153,39 @@ class CI_Input {
 	 */
 	protected function _fetch_from_array(&$array, $index = '', $xss_clean = FALSE)
 	{
-		if ( ! isset($array[$index]))
+		if (isset($array[$index]))
+		{
+			$value = $array[$index];
+		}
+		elseif (($count = preg_match_all('/(?:^[^\[]+)|\[[^]]*\]/', $index, $matches)) > 1) // Does the index contain array notation
+		{
+			$value = $array;
+			for ($i = 0; $i < $count; $i++)
+			{
+				$key = trim($matches[0][$i], '[]');
+				if ($key === '') // Empty notation will return the value as array
+				{
+					break;
+				}
+
+				if (isset($value[$key]))
+				{
+					$value = $value[$key];
+				}
+				else
+				{
+					return NULL;
+				}
+			}
+		}
+		else
 		{
 			return NULL;
 		}
 
-		if ($xss_clean === TRUE)
-		{
-			return $this->security->xss_clean($array[$index]);
-		}
-
-		return $array[$index];
+		return ($xss_clean === TRUE)
+			? $this->security->xss_clean($value)
+			: $value;
 	}
 
 	// --------------------------------------------------------------------
@@ -745,7 +767,8 @@ class CI_Input {
 		if ( ! preg_match('/^[a-z0-9:_\/|-]+$/i', $str))
 		{
 			set_status_header(503);
-			exit('Disallowed Key Characters.');
+			echo 'Disallowed Key Characters.';
+			exit(EXIT_USER_INPUT);
 		}
 
 		// Clean UTF-8 if supported
@@ -767,31 +790,30 @@ class CI_Input {
 	 */
 	public function request_headers($xss_clean = FALSE)
 	{
+		// If header is already defined, return it immediately
+		if ( ! empty($this->headers))
+		{
+			return $this->headers;
+		}
+
 		// In Apache, you can simply call apache_request_headers()
 		if (function_exists('apache_request_headers'))
 		{
-			$headers = apache_request_headers();
+			return $this->headers = apache_request_headers();
 		}
-		else
-		{
-			$headers['Content-Type'] = isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : @getenv('CONTENT_TYPE');
 
-			foreach ($_SERVER as $key => $val)
+		$this->headers['Content-Type'] = isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : @getenv('CONTENT_TYPE');
+
+		foreach ($_SERVER as $key => $val)
+		{
+			if (sscanf($key, 'HTTP_%s', $header) === 1)
 			{
-				if (sscanf($key, 'HTTP_%s', $header) === 1)
-				{
-					$headers[$header] = $this->_fetch_from_array($_SERVER, $key, $xss_clean);
-				}
+				// take SOME_HEADER and turn it into Some-Header
+				$header = str_replace('_', ' ', strtolower($header));
+				$header = str_replace(' ', '-', ucwords($header));
+
+				$this->headers[$header] = $this->_fetch_from_array($_SERVER, $key, $xss_clean);
 			}
-		}
-
-		// take SOME_HEADER and turn it into Some-Header
-		foreach ($headers as $key => $val)
-		{
-			$key = str_replace(array('_', '-'), ' ', strtolower($key));
-			$key = str_replace(' ', '-', ucwords($key));
-
-			$this->headers[$key] = $val;
 		}
 
 		return $this->headers;

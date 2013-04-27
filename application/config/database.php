@@ -86,24 +86,51 @@ if(ENVIRONMENT == 'development'){
 		'hostname' => 'localhost',
 		'username' => 'root',
 		'password' => '',
-		'database' => 'commonprogramming',
+		'database' => 'polycademy2',
 		'dbdriver' => 'mysqli',
 		'dbprefix' => '',
 		'pconnect' => TRUE,
-		'db_debug' => TRUE,
+		'db_debug' => TRUE, //turn to false in production so you can handle your own errors
 		'cache_on' => FALSE,
 		'cachedir' => '',
 		'char_set' => 'utf8',
 		'dbcollat' => 'utf8_general_ci',
 		'swap_pre' => '',
 		'autoinit' => TRUE,
-		'encrypt' => FALSE,
+		'encrypt'  => FALSE,
 		'compress' => FALSE,
 		'stricton' => FALSE,
-		'failover' => array()
+		'failover' => array(),
+		//'port'	=> $mysql_config['port'], //FOR PORTS IF YOU NEED THEM
 	);
 
 }elseif(ENVIRONMENT == 'production'){
+
+	$services = getenv('VCAP_SERVICES');
+	$services_json = json_decode($services, true);
+	$mysql_config = $services_json['mysql-5.1'][0]['credentials'];
+	$db['default'] = array(
+		'dsn'		=> '',
+		'hostname'	=> $mysql_config['hostname'],
+		'username'	=> $mysql_config['user'],
+		'password'	=> $mysql_config['password'],
+		'database'	=> $mysql_config['name'],
+		'dbdriver'	=> 'mysqli',
+		'dbprefix'	=> '',
+		'pconnect'	=> TRUE,
+		'db_debug'	=> TRUE,
+		'cache_on'	=> FALSE,
+		'cachedir'	=> '',
+		'char_set'	=> 'utf8',
+		'dbcollat'	=> 'utf8_general_ci',
+		'swap_pre'	=> '',
+		'autoinit'	=> TRUE,
+		'encrypt'	=> FALSE,
+		'compress'	=> FALSE,
+		'stricton'	=> FALSE,
+		'failover'	=> array(),
+		'port'		=> $mysql_config['port'],
+	);
 
 }
 
