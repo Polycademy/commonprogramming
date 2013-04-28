@@ -92,7 +92,7 @@ if(ENVIRONMENT == 'development'){
 		'dbdriver'	=> 'pdo',
 		'dbprefix'	=> '',
 		'pconnect'	=> TRUE,
-		'db_debug'	=> TRUE, //turn to false in production so you can handle your own errors
+		'db_debug'	=> TRUE,
 		'cache_on'	=> FALSE,
 		'cachedir'	=> '',
 		'char_set'	=> 'utf8',
