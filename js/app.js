@@ -85,7 +85,7 @@ app.config(
 				.state(
 					'blog',
 					{
-						abstract: true, //this state is abstract, it provides an abstract base for children
+						abstract: true, //this state is abstract, it provides an abstract base for children (only abstract states can have a default child state)
 						url: '/blog',
 						templateUrl: 'blog.html',
 						controller: 'BlogCtrl'
@@ -94,7 +94,7 @@ app.config(
 				.state(
 					'blog.posts',
 					{
-						url: '',
+						url: '?limit&offset', //empty url demonstrates that it is the default childstate of the ui-view
 						templateUrl: 'blog_posts.html',
 						controller: 'BlogPostsCtrl'
 					}
@@ -102,13 +102,13 @@ app.config(
 				.state(
 					'blog.post',
 					{
-						url: '/:blogPostId',
+						url: '/{blogPostId:[0-9]+}/{blogPostTitle}', //blogPostId must be an id
 						views: {
 							'': {
 								templateUrl: 'blog_post.html',
 								controller: 'BlogPostCtrl'
 							},
-							'comments': {
+							'comments@blog.post': {
 								templateUrl: 'blog_post_comments.html',
 								controller: 'BlogPostCommentsCtrl'
 							}
