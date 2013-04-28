@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "1d75e512fdc62b1b7f67e2376f8cbc09",
+    "hash": "ef107b2cfe16d1154143b57f683e4011",
     "packages": [
         {
             "name": "alexandresalome/php-selenium",
@@ -937,55 +937,6 @@
             "time": "2013-03-10 23:05:38"
         },
         {
-            "name": "hybridauth/hybridauth",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/hybridauth/hybridauth.git",
-                "reference": "6d89473b379fc7a904e69ee63f548af3308bd4d9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/hybridauth/hybridauth/zipball/6d89473b379fc7a904e69ee63f548af3308bd4d9",
-                "reference": "6d89473b379fc7a904e69ee63f548af3308bd4d9",
-                "shasum": ""
-            },
-            "require": {
-                "ext-curl": "*",
-                "php": ">=5.2.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Hybrid": "hybridauth/"
-                }
-            },
-            "notification-url": "http://packagist.org/downloads/",
-            "license": [
-                "(MIT or GPL-3.0+)"
-            ],
-            "authors": [
-                {
-                    "name": "Miled",
-                    "email": "hybridauth@gmail.com"
-                }
-            ],
-            "description": "Open source social sign on PHP library.",
-            "homepage": "http://hybridauth.sourceforge.net",
-            "keywords": [
-                "OpenId",
-                "facebook",
-                "google",
-                "hybridauth",
-                "login",
-                "oauth",
-                "social",
-                "twitter",
-                "yahoo"
-            ],
-            "time": "2013-02-21 06:45:16"
-        },
-        {
             "name": "instaclick/php-webdriver",
             "version": "1.0.12",
             "source": {
@@ -1129,40 +1080,55 @@
             "time": "2013-01-14 16:07:06"
         },
         {
-            "name": "leafo/lessphp",
-            "version": "v0.3.8",
+            "name": "leighmacdonald/php_rbac",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "http://github.com/leafo/lessphp",
-                "reference": "v0.3.8"
+                "url": "https://github.com/leighmacdonald/php_rbac.git",
+                "reference": "af402e55966c7571abe7a82f723fee1fe1fdc1bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/leafo/lessphp/zipball/v0.3.8",
-                "reference": "v0.3.8",
+                "url": "https://api.github.com/repos/leighmacdonald/php_rbac/zipball/af402e55966c7571abe7a82f723fee1fe1fdc1bc",
+                "reference": "af402e55966c7571abe7a82f723fee1fe1fdc1bc",
                 "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "psr/log": "1.0.0"
+            },
+            "require-dev": {
+                "ext-apc": "*",
+                "phpunit/dbunit": "1.2.*@dev",
+                "phpunit/phpunit": "3.7.18"
             },
             "type": "library",
             "autoload": {
-                "classmap": [
-                    "lessc.inc.php"
-                ]
+                "psr-0": {
+                    "RBAC": "src/"
+                }
             },
-            "notification-url": "http://packagist.org/downloads/",
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "MIT",
-                "GPL-3.0"
+                "MIT"
             ],
             "authors": [
                 {
-                    "name": "Leaf Corcoran",
-                    "email": "leafot@gmail.com",
-                    "homepage": "http://leafo.net"
+                    "name": "Leigh MacDonald",
+                    "email": "leigh.macdonald@gmail.com",
+                    "homepage": "http://cudd.li",
+                    "role": "Developer"
                 }
             ],
-            "description": "lessphp is a compiler for LESS written in PHP.",
-            "homepage": "http://leafo.net/lessphp/",
-            "time": "2012-08-18 19:16:09"
+            "description": "An implementation of RBAC Level 2",
+            "homepage": "https://github.com/leighmacdonald/php_rbac",
+            "keywords": [
+                "Authentication",
+                "auth",
+                "database",
+                "rbac"
+            ],
+            "time": "2013-04-28 08:03:58"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -1648,6 +1614,44 @@
                 "validation"
             ],
             "time": "2013-03-16 19:15:08"
+        },
+        {
+            "name": "psr/log",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/log",
+                "reference": "1.0.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/php-fig/log/archive/1.0.0.zip",
+                "reference": "1.0.0",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Psr\\Log\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ],
+            "time": "2012-12-21 11:40:51"
         },
         {
             "name": "react/event-loop",
@@ -2432,11 +2436,11 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
+        "firephp/firephp-core": 20,
         "behat/behat": 0,
         "behat/mink": 0,
         "react/zmq": 20,
-        "firephp/firephp-core": 20,
-        "hybridauth/hybridauth": 20
+        "leighmacdonald/php_rbac": 20
     },
     "platform": [
 

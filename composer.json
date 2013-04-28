@@ -1,5 +1,6 @@
 {
     "require":{
+		"firephp/firephp-core": "dev-master",
         "behat/behat": "2.4.*@stable",
         "behat/mink-extension": "*",
         "behat/mink": "1.4@stable",
@@ -11,13 +12,11 @@
         "phpunit/phpunit": "3.7.*",
 		"cboden/Ratchet": "*",
 		"react/zmq": "dev-master",
-        "leafo/lessphp": "0.3.8",
 		"pimple/pimple": "*",
 		"polycademy/citemplating": "*",
+		"polycademy/validation": "*",
 		"jamierumbelow/pigeon": "*",
-		"firephp/firephp-core": "dev-master",
-		"hybridauth/hybridauth": "dev-master",
-		"polycademy/validation": "*"
+		"leighmacdonald/php_rbac": "dev-master"
 	},
     "config": {
         "bin-dir": "bin/"
