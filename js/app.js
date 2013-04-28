@@ -13,7 +13,8 @@ var app = angular.module('App', [
 	'ngResource', //for RESTful resources
 	'ngCookies',
 	'ui', //from angular UI
-	'ui.bootstrap'
+	'ui.bootstrap',
+	'ui.compat' //from angular ui state router
 ]);
 
 //Define all the page level controllers (Application Logic)
@@ -32,10 +33,11 @@ angular.module('Directives', []);
 //Define all routes here and which page level controller should handle them
 app.config(
 	[
-		'$routeProvider',
+		'$stateProvider',
+		'$urlRouterProvider',
 		'$locationProvider',
 		'UsersServProvider',
-		function($routeProvider, $locationProvider, UsersServProvider) {
+		function($stateProvider, $urlRouterProvider, $locationProvider, UsersServProvider) {
 			
 			//setting up the authentication/register page (before any instantiation)
 			UsersServProvider.setLoginPage = '/auth';
@@ -43,48 +45,79 @@ app.config(
 			//HTML5 Mode URLs
 			$locationProvider.html5Mode(true).hashPrefix('!');
 			
-			//Routing
-			$routeProvider
-				.when(
-					'/',
+			//when we are using ui-router, we have to understand our user interface as a hierarchical state machine
+			//each state can have multiple view components, these components are always present in that particular state
+			//each state can have sub states which represent a whole new state, which would bring in new view components and transitions
+			
+			$stateProvider
+				.state(
+					'home',
 					{
-						templateUrl: 'home_index.html',
-						controller: 'HomeIndexCtrl'
+						url: '/',
+						templateUrl: 'home.html',
+						controller: 'HomeCtrl'
 					}
 				)
-				.when(
-					'/auth',
+				.state(
+					'auth',
 					{
-						templateUrl: 'auth_index.html',
-						controller: 'AuthIndexCtrl'
+						url: '/auth',
+						templateUrl: 'auth.html',
+						controller: 'AuthCtrl'
 					}
 				)
-				.when(
-					'/courses',
+				.state(
+					'courses',
 					{
-						templateUrl: 'courses_index.html',
-						controller: 'CoursesIndexCtrl'
+						url: '/courses',
+						templateUrl: 'courses.html',
+						controller: 'CoursesCtrl'
 					}
 				)
-				.when(
-					'/blog',
+				.state(
+					'canvas',
 					{
-						templateUrl: 'blog_index.html',
-						controller: 'BlogIndexCtrl'
+						url: '/canvas',
+						templateUrl: 'canvas.html',
+						controller: 'CanvasCtrl'
 					}
 				)
-				.when(
-					'/canvas',
+				.state(
+					'blog',
 					{
-						templateUrl: 'canvas_index.html',
-						controller: 'CanvasIndexCtrl'
+						abstract: true, //this state is abstract, it provides an abstract base for children
+						url: '/blog',
+						templateUrl: 'blog.html',
+						controller: 'BlogCtrl'
 					}
 				)
-				.otherwise(
+				.state(
+					'blog.posts',
 					{
-						redirectTo: '/'
+						url: '',
+						templateUrl: 'blog_posts.html',
+						controller: 'BlogPostsCtrl'
+					}
+				)
+				.state(
+					'blog.post',
+					{
+						url: '/:blogPostId',
+						views: {
+							'': {
+								templateUrl: 'blog_post.html',
+								controller: 'BlogPostCtrl'
+							},
+							'comments': {
+								templateUrl: 'blog_post_comments.html',
+								controller: 'BlogPostCommentsCtrl'
+							}
+						}
 					}
 				);
+			
+			//redirect anything else to home page
+			$urlRouterProvider.otherwise('/');
 			
 		}
 	]
@@ -109,7 +142,9 @@ app.run([
 	'$rootScope',
 	'$cookies',
 	'$http',
-	function($rootScope, $cookies, $http){
+	'$state',
+	'$stateParams',
+	function($rootScope, $cookies, $http, $state, $stateParams){
 	
 		//XSRF INTEGRATION
 		$rootScope.$watch(
@@ -119,7 +154,11 @@ app.run([
 			function(){
 				$http.defaults.headers.common['X-XSRF-TOKEN'] = $cookies[serverVars.csrfCookieName];
 			}
-		);		
+		);
+		
+		//PROVIDING STATE ON ROOTSCOPE
+		$rootScope.$state = $state;
+		$rootScope.$stateParams = $stateParams;
 		
 	}
 ]);

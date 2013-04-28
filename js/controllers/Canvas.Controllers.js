@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('Controllers')
-	.controller('CanvasIndexCtrl', [
+	.controller('CanvasCtrl', [
 		'$scope',
 		'UsersServ',
 		'WebSocketsServ',

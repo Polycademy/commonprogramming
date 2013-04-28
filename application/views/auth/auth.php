@@ -1,4 +1,4 @@
-<script type="text/ng-template" id="auth_index.html">
+<script type="text/ng-template" id="auth.html">
 	<form name="loginForm" ng-submit="login()">
 		<label for="username">USERNAME:</label>
 		<input id="username" type="text" ng-model="loginForm.username" />

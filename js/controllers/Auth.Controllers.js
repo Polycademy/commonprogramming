@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('Controllers')
-	.controller('AuthIndexCtrl', [
+	.controller('AuthCtrl', [
 		'$scope',
 		'UsersServ',
 		function($scope, UsersServ){

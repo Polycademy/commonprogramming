@@ -10,107 +10,6 @@ angular.module('Directives')
 				scope: true,
 				link: function(scope, element, attributes){
 				
-					// var chessboard = [];
-					// var x = 0;
-					// var y = 0;
-					
-					// this runs 8 times for each row
-					// for(var i=1; i<9; i++){
-						// i gives me 1, 9, starting point of the square
-						
-						// y += 100;
-						// var j = 1;
-						
-						// if(i % 2 !== 0){
-							// odd row
-							// for (j=1; j<9; j++){
-							
-								// x += 100;
-							
-								// if(j % 2 !== 0){
-									// odd column
-									// chessboard.push({
-										// type: 'white',
-										// coord: String.fromCharCode(65 + (j - 1)) + '' + (9 - i)
-									// });
-								// }else{
-									// even column
-									// chessboard.push({
-										// type: 'black',
-										// coord: String.fromCharCode(65 + (j - 1)) + '' + (9 - i)
-									// });
-								// }
-							
-							// }
-						// }else{
-							// even row
-							// for (j=1; j<9; j++){
-							
-								// x += 100;
-								
-								// if(j % 2 !== 0){
-									// odd column
-									// chessboard.push({
-										// type: 'black',
-										// coord: String.fromCharCode(65 + (j - 1)) + '' + (9 - i)
-									// });
-								// }else{
-									// even column
-									// chessboard.push({
-										// type: 'white',
-										// coord: String.fromCharCode(65 + (j - 1)) + '' + (9 - i)
-									// });
-								// }
-							
-							// }
-						// }
-						
-					// }
-					
-					// console.dir(chessboard);
-					
-					
-					
-					// for(var i = 1; i < 65; i++){
-					
-						// if(i % 8 != 0){
-							// if(i % 2 != 0){
-								// var square = {
-									// type: 'white',
-									// id: i
-								// };
-								// chessboard.push(square);
-							// }else{
-								// var square = {
-									// type: 'black',
-									// id: i
-								// };
-								// chessboard.push(square);
-							// }
-						// }else{
-						
-						
-						// }
-					
-					// }
-					
-					// console.dir(chessboard);
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-					/*
 					//establishing the stage
 					var stage = new KineticServ.Stage({
 						container: element[0], //pointing to current element
@@ -213,7 +112,6 @@ angular.module('Directives')
 						});
 					
 					});
-					*/
 					
 					/* //previous code
 					var drawRectangle = function(myRectangle, context){
@@ -277,7 +175,6 @@ angular.module('Directives')
 						var startTime = (new Date()).getTime();
 						animate(myRectangle, canvas, context, startTime);
 					}, 1000);
-					
 					*/
 				
 				}

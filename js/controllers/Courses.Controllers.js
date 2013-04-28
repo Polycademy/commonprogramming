@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('Controllers')
-	.controller('CoursesIndexCtrl', [
+	.controller('CoursesCtrl', [
 		'$scope',
 		'CoursesServ',
 		function($scope, CoursesServ){

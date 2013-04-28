@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('Controllers')
-	.controller('BlogIndexCtrl', [
+	.controller('BlogCtrl', [
 		'$scope',
 		'UsersServ',
 		function($scope){

@@ -2,19 +2,16 @@
 
 class Home extends CI_Controller{
 
-	public $view_data = array();
-
 	public function __construct(){
 	
 		parent::__construct();
-		
-		$this->view_data += $this->config->item('view_data');
 	
 	}
 	
 	public function index(){
 		
-		Template::compose('index', $this->view_data);
+		//due to single page app, we're just going with a default layout, no need for server side templating libraries
+		$this->load->view('layouts/default_layout', $this->config->item('sitemeta'));
 	
 	}
 

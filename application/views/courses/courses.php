@@ -1,4 +1,4 @@
-<script type="text/ng-template" id="courses_index.html">
+<script type="text/ng-template" id="courses.html">
 	<div class="course_list">
 		<p>Demonstration of a course list! And delete button! And update button pointing to another controller!</p>
 		<span ng-show="coursesError">{{coursesError}}</span>

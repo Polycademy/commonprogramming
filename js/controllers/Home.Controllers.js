@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('Controllers')
-	.controller('HomeIndexCtrl', [
+	.controller('HomeCtrl', [
 		'$scope',
 		function($scope){
 			$scope.data = 'HELLO WORLD!';

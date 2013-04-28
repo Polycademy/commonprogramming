@@ -1,4 +1,4 @@
-<script type="text/ng-template" id="blog_index.html">
+<script type="text/ng-template" id="random.html">
 	<textarea ui-codemirror="{theme:'rubyblue', mode:'javascript'}" ng-model="codeMirrorModel"></textarea>
 	<div>
 		<label class="checkbox">
@@ -20,14 +20,4 @@
 			</div>
 		</div>
 	</div>
-	
-	<!-- FOR SUBCONTROLLER DummyIndexCtrl
-	<div ng-controller="ChildSubCtrl" ng-repeat="child in children">
-		<h2>CHILD NAME: {{child.name}} from {{child.id}}</h2>
-		<div ng-controller="PlanSubCtrl" ng-repeat="plan in plans">
-			<p>Plan Title: {{plan.planTitle}}</p>
-		</div>
-	</div>
-	-->
-	
 </script>
