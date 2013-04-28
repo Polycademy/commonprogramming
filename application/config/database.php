@@ -81,27 +81,29 @@ $query_builder = TRUE;
 
 if(ENVIRONMENT == 'development'){
 
+	$database_name = 'commonprogramming';
+
 	$db['default'] = array(
-		'dsn'	=> '',
-		'hostname' => 'localhost',
-		'username' => 'root',
-		'password' => '',
-		'database' => 'commonprogramming',
-		'dbdriver' => 'mysqli',
-		'dbprefix' => '',
-		'pconnect' => TRUE,
-		'db_debug' => TRUE, //turn to false in production so you can handle your own errors
-		'cache_on' => FALSE,
-		'cachedir' => '',
-		'char_set' => 'utf8',
-		'dbcollat' => 'utf8_general_ci',
-		'swap_pre' => '',
-		'autoinit' => TRUE,
-		'encrypt'  => FALSE,
-		'compress' => FALSE,
-		'stricton' => FALSE,
-		'failover' => array(),
-		//'port'	=> $mysql_config['port'], //FOR PORTS IF YOU NEED THEM
+		'dsn'		=> 'mysql:host=localhost;dbname=' . $database_name,
+		'hostname'	=> 'localhost',
+		'username'	=> 'root',
+		'password'	=> '',
+		'database'	=> $database_name,
+		'dbdriver'	=> 'pdo',
+		'dbprefix'	=> '',
+		'pconnect'	=> TRUE,
+		'db_debug'	=> TRUE, //turn to false in production so you can handle your own errors
+		'cache_on'	=> FALSE,
+		'cachedir'	=> '',
+		'char_set'	=> 'utf8',
+		'dbcollat'	=> 'utf8_general_ci',
+		'swap_pre'	=> '',
+		'autoinit'	=> TRUE,
+		'encrypt'	=> FALSE,
+		'compress'	=> FALSE,
+		'stricton'	=> FALSE,
+		'failover'	=> array(),
+		//'port'	=> 1234, //FOR PORTS IF YOU NEED THEM
 	);
 
 }elseif(ENVIRONMENT == 'production'){
@@ -111,12 +113,12 @@ if(ENVIRONMENT == 'development'){
 	$services_json = json_decode($services, true);
 	$mysql_config = $services_json['mysql-5.1'][0]['credentials'];
 	$db['default'] = array(
-		'dsn'		=> '',
+		'dsn'		=> 'mysql:host=' . $mysql_config['hostname'] . ';dbname=' . $mysql_config['name'] . ';port=' . $mysql_config['port'],
 		'hostname'	=> $mysql_config['hostname'],
 		'username'	=> $mysql_config['user'],
 		'password'	=> $mysql_config['password'],
 		'database'	=> $mysql_config['name'],
-		'dbdriver'	=> 'mysqli',
+		'dbdriver'	=> 'pdo',
 		'dbprefix'	=> '',
 		'pconnect'	=> TRUE,
 		'db_debug'	=> TRUE,
