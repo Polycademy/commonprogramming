@@ -59,6 +59,14 @@ app.config(
 					}
 				)
 				.state(
+					'random',
+					{
+						url: '/random',
+						templateUrl: 'random.html',
+						controller: 'RandomCtrl'
+					}
+				)
+				.state(
 					'auth',
 					{
 						url: '/auth',
