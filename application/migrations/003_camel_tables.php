@@ -1,5 +1,10 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
+//this migration demonstrates a potential migration that changes snake case column names to camelcase names
+//this is so that it works better with javascript
+//however it is no longer required, as we will be writing all of our own tables with camelcased names from the very beginning
+//remember third party tables may not follow this convention, so we'll let them pass
+
 class Migration_camel_tables extends CI_Migration {
 
 	public function up(){

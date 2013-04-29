@@ -11,20 +11,20 @@ class Migration_add_courses extends CI_Migration {
 				'type'	=> 'VARCHAR',
 				'constraint'	=> '50',
 			),
-			'starting_date' => array(
+			'startingDate' => array(
 				'type' => 'DATE',
 			),
-			'days_duration'	=> array(
+			'daysDuration'	=> array(
 				'type' => 'SMALLINT',
 			),
 			'times'	=> array(
 				'type'	=> 'VARCHAR',
 				'constraint'	=> '100',
 			),
-			'number_of_applications'	=> array(
+			'numberOfApplications'	=> array(
 				'type'	=> 'SMALLINT',
 			),
-			'number_of_students'	=> array(
+			'numberOfStudents'	=> array(
 				'type'	=> 'SMALLINT',
 			),
 		));

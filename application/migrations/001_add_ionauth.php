@@ -3,9 +3,6 @@
 class Migration_add_ionauth extends CI_Migration {
 
 	public function up(){
-	
-		// Drop table 'groups' if it exists		
-		//$this->dbforge->drop_table('groups');
 
 		// Table structure for table 'groups'
 		$this->dbforge->add_field(array(
@@ -25,7 +22,7 @@ class Migration_add_ionauth extends CI_Migration {
 			)
 		));
 		$this->dbforge->add_key('id', TRUE);
-		$this->dbforge->create_table('groups');
+		$this->dbforge->create_table('groups', true);
 
 		// Dumping data for table 'groups'
 		$data = array(
@@ -42,10 +39,6 @@ class Migration_add_ionauth extends CI_Migration {
 		);
 		$this->db->insert_batch('groups', $data);
 
-
-		// Drop table 'users' if it exists
-		//$this->dbforge->drop_table('users');
-
 		// Table structure for table 'users'
 		$this->dbforge->add_field(array(
 			'id' => array(
@@ -54,7 +47,7 @@ class Migration_add_ionauth extends CI_Migration {
 				'unsigned' => TRUE,
 				'auto_increment' => TRUE
 			),
-			'ip_address' => array(
+			'ipAddress' => array(
 				'type' => 'VARBINARY',
 				'constraint' => '16'
 			),
@@ -74,33 +67,33 @@ class Migration_add_ionauth extends CI_Migration {
 				'type' => 'VARCHAR',
 				'constraint' => '100'
 			),
-			'activation_code' => array(
+			'activationCode' => array(
 				'type' => 'VARCHAR',
 				'constraint' => '40',
 				'null' => TRUE
 			),
-			'forgotten_password_code' => array(
+			'forgottenPasswordCode' => array(
 				'type' => 'VARCHAR',
 				'constraint' => '40',
 				'null' => TRUE
 			),
-			'forgotten_password_time' => array(
+			'forgottenPasswordTime' => array(
 				'type' => 'INT',
 				'constraint' => '11',
 				'unsigned' => TRUE,
 				'null' => TRUE
 			),
-			'remember_code' => array(
+			'rememberCode' => array(
 				'type' => 'VARCHAR',
 				'constraint' => '40',
 				'null' => TRUE
 			),
-			'created_on' => array(
+			'createdOn' => array(
 				'type' => 'INT',
 				'constraint' => '11',
 				'unsigned' => TRUE,
 			),
-			'last_login' => array(
+			'lastLogin' => array(
 				'type' => 'INT',
 				'constraint' => '11',
 				'unsigned' => TRUE,
@@ -112,12 +105,12 @@ class Migration_add_ionauth extends CI_Migration {
 				'unsigned' => TRUE,
 				'null' => TRUE
 			),
-			'first_name' => array(
+			'firstName' => array(
 				'type' => 'VARCHAR',
 				'constraint' => '50',
 				'null' => TRUE
 			),
-			'last_name' => array(
+			'lastName' => array(
 				'type' => 'VARCHAR',
 				'constraint' => '50',
 				'null' => TRUE
@@ -135,31 +128,27 @@ class Migration_add_ionauth extends CI_Migration {
 
 		));
 		$this->dbforge->add_key('id', TRUE);
-		$this->dbforge->create_table('users');
+		$this->dbforge->create_table('users', true);
 
 		// Dumping data for table 'users'
 		$data = array(
 			'id' => '1',
-			'ip_address' => inet_pton('127.0.0.1'),
+			'ipAddress' => inet_pton('127.0.0.1'),
 			'username' => 'administrator',
 			'password' => '$2a$07$SeBknntpZror9uyftVopmu61qg0ms8Qv1yV6FG.kQOSM.9QhmTo36',
 			'salt' => '9462e8eee0',
 			'email' => 'admin@admin.com',
-			'activation_code' => '',
-			'forgotten_password_code' => NULL,
-			'created_on' => '1268889823',
-			'last_login' => '1268889823',
+			'activationCode' => '',
+			'forgottenPasswordCode' => NULL,
+			'createdOn' => '1268889823',
+			'lastLogin' => '1268889823',
 			'active' => '1',
-			'first_name' => 'Admin',
-			'last_name' => 'istrator',
+			'firstName' => 'Admin',
+			'lastName' => 'istrator',
 			'company' => 'ADMIN',
 			'phone' => '0',
 		);
 		$this->db->insert('users', $data);
-
-
-		// Drop table 'users_groups' if it exists		
-		//$this->dbforge->drop_table('users_groups');
 
 		// Table structure for table 'users_groups'
 		$this->dbforge->add_field(array(
@@ -169,38 +158,34 @@ class Migration_add_ionauth extends CI_Migration {
 				'unsigned' => TRUE,
 				'auto_increment' => TRUE
 			),
-			'user_id' => array(
+			'userId' => array(
 				'type' => 'MEDIUMINT',
 				'constraint' => '8',
 				'unsigned' => TRUE
 			),
-			'group_id' => array(
+			'groupId' => array(
 				'type' => 'MEDIUMINT',
 				'constraint' => '8',
 				'unsigned' => TRUE
 			)
 		));
 		$this->dbforge->add_key('id', TRUE);
-		$this->dbforge->create_table('users_groups');
+		$this->dbforge->create_table('users_groups', true);
 
 		// Dumping data for table 'users_groups'
 		$data = array(
 			array(
 				'id' => '1',
-				'user_id' => '1',
-				'group_id' => '1',
+				'userId' => '1',
+				'groupId' => '1',
 			),
 			array(
 				'id' => '2',
-				'user_id' => '1',
-				'group_id' => '2',
+				'userId' => '1',
+				'groupId' => '2',
 			)
 		);
 		$this->db->insert_batch('users_groups', $data);
-		
-
-		// Drop table 'login_attempts' if it exists
-		//$this->dbforge->drop_table('login_attempts');
 
 		// Table structure for table 'login_attempts'
 		$this->dbforge->add_field(array(
@@ -210,7 +195,7 @@ class Migration_add_ionauth extends CI_Migration {
 				'unsigned' => TRUE,
 				'auto_increment' => TRUE
 			),
-			'ip_address' => array(
+			'ipAddress' => array(
 				'type' => 'VARBINARY',
 				'constraint' => '16'
 			),
@@ -227,7 +212,7 @@ class Migration_add_ionauth extends CI_Migration {
 			)
 		));
 		$this->dbforge->add_key('id', TRUE);
-		$this->dbforge->create_table('login_attempts');
+		$this->dbforge->create_table('login_attempts', true);
 
 	}
 
