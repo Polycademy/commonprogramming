@@ -1,11 +1,12 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Migration_add_rbac extends CI_Migration {
+class Migration_add_rbac1 extends CI_Migration {
 
 	public function up(){
 	
 		//This is the RBAC schema designed for MySQL, it's complex, so we use direct queries!
-	
+		//This is LEVEL 1 RBAC, later on you can update to LEVEL 2 RBAC
+		
 		$create_auth_permission = 
 			'CREATE TABLE `auth_permission` (
 				`permission_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
