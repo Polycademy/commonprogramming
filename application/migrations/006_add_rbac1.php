@@ -68,10 +68,13 @@ class Migration_add_rbac1 extends CI_Migration {
 
 	public function down(){
 	
+		//when using foreign keys, if you need to drop them, make sure to ignore them and then set them up again
+		$this->db->query('SET foreign_key_checks = 0;');
 		$this->dbforge->drop_table('auth_permission');
 		$this->dbforge->drop_table('auth_role');
 		$this->dbforge->drop_table('auth_role_permissions');
 		$this->dbforge->drop_table('auth_user_role');
+		$this->db->query('SET foreign_key_checks = 1;');
 	
 	}
 }
