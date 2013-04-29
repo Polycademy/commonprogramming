@@ -17,7 +17,11 @@
 		"polycademy/citemplating": "*",
 		"polycademy/validation": "*",
 		"jamierumbelow/pigeon": "*",
-		"leighmacdonald/php_rbac": "dev-master"
+		"aura/session": "1.0.0-beta1",
+		"leighmacdonald/php_rbac": "dev-master",
+		"ircmaxell/password-compat": "*",
+		"phpmailer/phpmailer": "5.2.*",
+		"psr/log": "1.0.0"
 	},
     "config": {
         "bin-dir": "bin/"
