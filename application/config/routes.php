@@ -13,6 +13,9 @@ Pigeon::map(function($r){
 		$r->get('migrate/restart',  'migrate/restart');
 		$r->get('migrate/restart/(:num)',  'migrate/restart/$1');
 		
+		//for random code to test
+		$r->resources('test');
+		
 		//generic CRUD demonstration
 		$r->resources('courses');
 		

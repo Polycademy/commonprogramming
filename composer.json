@@ -1,5 +1,6 @@
 {
     "require":{
+		"monolog/monolog": "*",
 		"firephp/firephp-core": "dev-master",
         "behat/behat": "2.4.*@stable",
         "behat/mink-extension": "*",

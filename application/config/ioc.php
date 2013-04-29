@@ -8,9 +8,49 @@
  * Note Pimple is an object that acts like an array, see the actual Pimple code to see how this works.
  * This usage assumes that you have autoloading working, so that the references to the classes will be autoloaded!
  */
-
+ 
 $ioc = new Pimple;
 
+//MONOLOG BASED LOGGER, use this for libraries that need to log things, in fact this can replace the standard Codeigniter Logger
+$ioc['logger'] = function($c){
+
+	if($this->config['log_threshold'] !== 0){
+	
+		$log_path = ($this->config['log_path'] !== '') ? $this->config['log_path'] : APPPATH.'logs/';
+		
+		//codeigniter's options is a maximum threshold, while monolog is a minimum threshold, we'll need to switch them around
+		switch($this->config['log_threshold']){
+			case 1:
+				$log_threshold = Monolog\Logger::ERROR;
+				break;
+			case 2:
+				$log_threshold = Monolog\Logger::NOTICE;
+				break;
+			case 3:
+				$log_threshold = Monolog\Logger::INFO;
+				break;
+			case 4:
+				$log_threshold = Monolog\Logger::DEBUG;
+				break;
+			default:
+				$log_threshold = Monolog\Logger::DEBUG;
+		}
+		
+		$logger = new Monolog\Logger('Monolog');
+		$logger->pushHandler(new Monolog\Handler\StreamHandler($log_path, $log_threshold));
+	
+	}else{
+	
+		//if the log_threshold was 0, then we should simply disable it, this is fine for libraries that accept a null parameter for optional classes
+		$logger = null;
+		
+	}
+	
+	return $logger;
+	
+};
+
+//HERE IS JUST SOME RANDOM EXAMPLES!
 $ioc['WorkerLibrary'] = function($c){
 	return new WorkerLibrary;
 };

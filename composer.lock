@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "ef107b2cfe16d1154143b57f683e4011",
+    "hash": "189fa002a31d6a631218a62d7cf6cc6a",
     "packages": [
         {
             "name": "alexandresalome/php-selenium",
@@ -1085,12 +1085,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/leighmacdonald/php_rbac.git",
-                "reference": "af402e55966c7571abe7a82f723fee1fe1fdc1bc"
+                "reference": "41b5cb4a223f0b7b808d7d1bf9262f7ef69dd001"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/leighmacdonald/php_rbac/zipball/af402e55966c7571abe7a82f723fee1fe1fdc1bc",
-                "reference": "af402e55966c7571abe7a82f723fee1fe1fdc1bc",
+                "url": "https://api.github.com/repos/leighmacdonald/php_rbac/zipball/41b5cb4a223f0b7b808d7d1bf9262f7ef69dd001",
+                "reference": "41b5cb4a223f0b7b808d7d1bf9262f7ef69dd001",
                 "shasum": ""
             },
             "require": {
@@ -1128,7 +1128,69 @@
                 "database",
                 "rbac"
             ],
-            "time": "2013-04-28 08:03:58"
+            "time": "2013-04-29 06:49:44"
+        },
+        {
+            "name": "monolog/monolog",
+            "version": "1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Seldaek/monolog.git",
+                "reference": "1.5.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/1.5.0",
+                "reference": "1.5.0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0",
+                "psr/log": ">=1.0,<2.0"
+            },
+            "require-dev": {
+                "doctrine/couchdb": "dev-master",
+                "mlehner/gelf-php": "1.0.*",
+                "raven/raven": "0.3.*"
+            },
+            "suggest": {
+                "doctrine/couchdb": "Allow sending log messages to a CouchDB server",
+                "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
+                "ext-mongo": "Allow sending log messages to a MongoDB server",
+                "mlehner/gelf-php": "Allow sending log messages to a GrayLog2 server",
+                "raven/raven": "Allow sending log messages to a Sentry server"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Monolog": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Sends your logs to files, sockets, inboxes, databases and various web services",
+            "homepage": "http://github.com/Seldaek/monolog",
+            "keywords": [
+                "log",
+                "logging",
+                "psr-3"
+            ],
+            "time": "2013-04-23 10:09:48"
         },
         {
             "name": "phpunit/php-code-coverage",
