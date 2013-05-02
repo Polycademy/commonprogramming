@@ -81,7 +81,7 @@ class AccountsManager{
 			$this->bcrypt_fallback = new BcryptFallback($this->options['hash_rounds']);
 		}
 		
-		$this->begin();
+		$this->startyourengines();
 		
 	}
 	
@@ -112,7 +112,7 @@ class AccountsManager{
 			'role_default'						=> 'members',
 			'role_admin'						=> 'admin',
 			//login options (this is the field used to login with, plus login attempts)
-			'login_identity'					=> 'username', //can be email, username or any database field, all fields are optional when registering, you need to force constraints
+			'login_identity'					=> 'username', //can be email or username
 			'login_password_minlength'			=> 8,
 			'login_password_maxlength'			=> 20,
 			'login_persistent'					=> true, //allowing remember me or not
@@ -144,7 +144,7 @@ class AccountsManager{
 	
 	}
 	
-	protected function begin(){
+	protected function startyourengines(){
 	
 		if(!$this->logged_in() && $this->cookie_manager->get_cookie('identity') && $this->cookie_manager->get_cookie('rememberCode')){
 			$this->login_remembered_user();
@@ -152,11 +152,63 @@ class AccountsManager{
 	
 	}
 	
-	public function logged_in(){
+	public function register(){
+	
+	}
+	
+	public function username_check(){
+	
+	}
+	
+	public function email_check(){
+	
+	}
+	
+	public function identity_check(){
+	
+	}
+	
+	public function activate(){
+	
+	}
+	
+	public function deactivate(){
+	
+	}
+	
+	public function login(){
 	
 	}
 	
 	public function login_remembered_user(){
+	
+	}
+	
+	public function is_max_login_attempts_exceeded(){
+	
+	}
+	
+	public function get_last_attempt_time(){
+	
+	}
+	
+	public function get_attempts_num(){
+	
+	}
+	
+	public function is_time_locked_out(){
+	
+	}
+	
+	public function clear_login_attempts(){
+	
+	}
+	
+	public function logged_in(){
+	
+	}
+	
+	public function logout(){
 	
 	}
 	
@@ -172,20 +224,36 @@ class AccountsManager{
 	
 	}
 	
-	public function register(){
+	public function clear_forgotten_password_code(){
 	
 	}
 	
-	public function activate(){
+	public function reset_password(){
 	
 	}
 	
-	public function logout(){
+	public function change_password(){
 	
 	}
 	
-	//helper function to determine if the current logged in user has admin level access
-	public function is_admin(){
+	//get the currently logged in user, if the user is not logged in, gets the current session
+	public function get_user(){
+	
+		//return the RBAC user object, which you can test for permissions or grab its user data or session data
+		
+	}
+	
+	//get all users based on roles
+	public function get_user_by_role(){
+	
+		//returns an array of RBAC user objects
+	
+	}
+	
+	//get all the user by the permission
+	public function get_user_by_permission(){
+	
+		//returns an array of RBAC user objects
 	
 	}
 	
