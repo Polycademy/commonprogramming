@@ -53,7 +53,9 @@ class AccountsManager{
 	protected $mailer;
 	protected $bcrypt_fallback = false;
 	
-	protected $user_account; //this is used to represent the user account for the RBAC, it is only initialised when a person logs in or registers
+	protected $user; //this is used to represent the user account for the RBAC, it is only initialised when a person logs in or registers
+	
+	protected $errors = array();
 	
 	//expects PDO connection (potentially using $this->db->conn_id)
 	//SessionInterface is a copy of the PHP5.4.0 SessionHandlerInterface, this allows backwards compatibility
@@ -106,11 +108,23 @@ class AccountsManager{
 			'cookie_httponly'					=> false,
 			//email options (email data should be passed in as a string, end user manages their own stuff)
 			'email'								=> false, //make this true to use the emails by PHPMailer, otherwise false if you want to roll your own email solution, watch out for email activation
+			'email_smtp'						=> false,
+			'email_host'						=> '',
+			'email_auth'						=> false,
+			'email_username'					=> '',
+			'email_password'					=> '',
+			'email_smtp_secure'					=> '', //tls or ssl or false
 			'email_from'						=> 'enquiry@polycademy.com',
+			'email_from_name'					=> 'Polycademy',
+			'email_replyto'						=> false, //can be an email or false
+			'email_replyto_name'				=> '',
+			'email_cc'							=> false,
+			'email_bcc'							=> false,
 			'email_type'						=> 'html', //can be text or html
+			'email_activation_template'			=> 'Here is your activation code: {{activation_code}}',
+			'email_forgotten_template'			=> 'Here is your temporary login: {{temporary_login_code}}',
 			//rbac options (initial roles from the migration, also who's the default role, and root access role?)
 			'role_default'						=> 'members',
-			'role_admin'						=> 'admin',
 			//login options (this is the field used to login with, plus login attempts)
 			'login_identity'					=> 'username', //can be email or username
 			'login_password_minlength'			=> 8,
@@ -122,7 +136,7 @@ class AccountsManager{
 			'login_lockout'						=> 0, //lockout time in seconds
 			'login_forgot_password_expiration'	=> 0, //how long before the temporary password expires
 			//registration options
-			'reg_activation'					=> 'none', //can be email, manual, or none
+			'reg_activation'					=> false, //can be email, manual, or false
 		);
 		
 		if($options != false){
@@ -146,25 +160,236 @@ class AccountsManager{
 	
 	protected function startyourengines(){
 	
+		//immediately logs the person in if they have identity, rememberCode and are not currently logged in
 		if(!$this->logged_in() && $this->cookie_manager->get_cookie('identity') && $this->cookie_manager->get_cookie('rememberCode')){
 			$this->login_remembered_user();
+		}
+		
+		//... continue
+		
+	
+	}
+	
+	//let's provide some registration
+	//we'll accept some parameters, add them to the database, assign them any default roles
+	//this doesn't do validation
+	public function register($data){
+		
+		//login_data should have username, password or email
+		if(empty($data[$this->options['login_identity']]) OR empty($data['password'])){
+			$this->errors[] = $this->lang['account_creation_invalid'];
+			return false;
+		}
+		
+		if($this->options['email']){
+			if(empty($data['email'])){
+				$this->errors[] = $this->lang['account_creation_email_invalid'];
+				return false;
+			}
+		}
+		
+		//check for duplicates based on identity
+		if(!$this->identity_check($data[$this->options['login_identity']])){
+			return false;
+		}
+		
+		$data['ipAddress'] = $this->prepare_ip($_SERVER['REMOTE_ADDR']);
+		$data['password'] = $this->hash_password($data['password'], $this->options['hash_method'], $this->options['hash_rounds']);
+		
+		$data += array(
+		    'createdOn'	=> date('Y-m-d H:i:s'),
+		    'lastLogin'	=> date('Y-m-d H:i:s'),
+		    'active'	=> ($this->options['reg_activation'] === false ? 1 : 0),
+		);
+		
+		//inserting activation code into the users table, if the reg_activation is by email
+		$activation_code = false;
+		if($this->options['reg_activation'] == 'email'){
+			$activation_code = $this->generate_activation_code();
+			$data['activationCode'] = $activation_code; 
+		}
+		
+		$column_string = implode(',', array_keys($data));
+		$value_string = implode(',', array_fill(0, count($data), '?'));
+		
+		$query = "INSERT INTO {$this->options['table_users']} ({$column_string}) VALUES ({$value_string})";
+		$sth = $this->db->prepare($query);
+		
+		try {
+
+			$sth->execute(array_values($data));
+			$last_insert_id = $sth->lastInsertId();
+			
+		}catch(PDOException $db_err){
+
+			if($this->logger){
+				$this->logger->error('Failed to execute query to register a new user and assign permissions.', ['exception' => $db_err]);
+			}
+			$this->errors[] = $this->lang['account_creation_unsuccessful'];
+			return false;
+			
+		}
+		
+		//now we've got to add the default roles and permissions
+		if(!$this->register_roles($last_insert_id, array($this->options['role_default']))){
+			return false;
+		}
+		
+		//we should get back a $user with the role set defined, here we're initialising the user with the login data minus the password hash
+		unset($data['password']);
+		$this->user->set_user_data($data);
+		return $this->user;
+		
+	}
+	
+	//assume $body has {{activation_code}}
+	//this can be sent multiple times, the activation code doesn't change (so the concept of resend activation email)
+	public function send_activation_email($user_id, $subject = false, $body = false, $alt_body = false){
+	
+		if($this->options['reg_activation'] == 'email' AND $this->options['email']){
+		
+			$subject = (empty($subject)) ? $this->lang('email_activation_subject') : $subject;
+			$body = (empty($body)) ? $this->options['email_activation_template'] : $body;
+			
+			//take the user_id, grab the person's email and activation_code
+			$query = "SELECT email, activationCode FROM {$this->options['table_users']} WHERE id = :id";
+			$sth = $this->db->prepare($query);
+			$sth = $this->db->bindParam(':id', $user_id, PDO::PARAM_INT);
+			
+			try{
+				
+				$sth->execute();
+				//fetch a single row
+				$row = $sth->fetch(PDO::FETCH_OBJ);
+				
+				//use sprintf to insert activation code
+				$body = sprintf(str_replace('{{activation_code}}','\'%1$s\'', $body), $row->activationCode);
+				
+				//send email via PHPMailer
+				if(!$this->send_mail($row->email, $subject, $body, $alt_body)){
+					if($this->logger){
+						$this->logger->error('Failed to send activation email.');
+					}
+					$this->errors[] = $this->lang['email_activation_email_unsent'];
+					return false;
+				}
+				
+				return true;
+				
+			}catch(PDOException $db_err){
+			
+				if($this->logger){
+					$this->logger->error('Failed to execute query to fetch email and activation code given a user id.', ['exception' => $db_err]);
+				}
+				$this->errors[] = $this->lang['email_activation_email_unsent'];
+				return false;
+				
+			}
+		
+		}else{
+		
+			return false;
+		
+		}
+		
+	}
+	
+	public function send_mail($email_to, $subject, $body, $alt_body = false){
+	
+		if($this->options['email_smtp']){
+			$this->mailer->IsSMTP();
+			$this->mailer->Host = $this->options['email_host'];
+			if($this->options['email_auth']){
+				$this->mailer->SMTPAuth = true;
+				$this->mailer->Username = $this->options['email_username'];
+				$this->mailer->Password = $this->options['email_password'];
+			}
+			if($this->options['email_smtp_secure']) $this->mailer->SMTPSecure = $this->options['email_smtp_secure'];
+		}
+		
+		$this->mailer->From = $this->options['email_from'];
+		$this->mailer->FromName = $this->options['email_from_name'];
+		$this->mailer->AddAddress($email_to);
+		if($this->options['email_replyto']) $this->mailer->AddReplyTo($this->options['email_replyto'], $this->options['email_replyto_name']);
+		if($this->options['email_cc']) $this->mailer->AddCC($this->options['email_cc']);
+		if($this->options['email_bcc']) $this->mailer->AddBCC($this->options['email_bcc']);
+		if($this->options['email_html']) $this->mailer->IsHTML(true);
+		
+		$this->mailer->Subject = $subject;
+		$this->mailer->Body = $body;
+		if($alt_body) $this->mailer->AltBody = $alt_body;
+		
+		if(!$mail->Send()){
+			return false;
+		}
+		
+		return true;
+	
+	}
+	
+	//takes a user id and role object, and adds it to the user and saves it, the role object should have a list of permissions
+	public function register_roles($user_id, array $role_names){
+	
+		$this->user = new UserAccount($user_id);
+		
+		foreach($role_names as $role_name){
+		
+			$role = $this->role_manager->roleFetchByName($role_name);
+			
+			if(!$this->role_manager->roleAddSubject($role, $this->user)){
+				$this->errors[] = $this->lang['account_creation_assign_role'];
+				return false;
+			}
+			
+		}
+		
+		return $this->user;
+	
+	}
+	
+	protected function prepare_ip($ip_address) {
+	
+		$platform = $this->db->getAttribute(PDO::ATTR_DRIVER_NAME);
+		
+		if($platform == 'pgsql' || $platform == 'sqlsrv' || $platform == 'mssql'){
+			return $ip_address;
+		}else{
+			return inet_pton($ip_address);
+		}
+		
+	}
+	
+	public function identity_check($identity){
+		
+		$query = "SELECT id FROM {$this->options['table_users']} WHERE {$this->options['login_identity']} = :identity";
+		$sth = $this->db->prepare($query);
+		$sth = $this->db->bindParam(':identity', $identity, PDO::PARAM_STR);
+		
+		try {
+
+			//there basically should be nothing returned, if something is returned then identity check fails
+			$sth->execute();
+			if($sth->fetch(PDO::FETCH_NUM) > 0){
+				$this->errors[] = $this->lang["account_creation_duplicate_{$this->options['login_identity']}"];
+				return false;
+			}
+			return true;
+			
+		}catch(PDOException $db_err){
+
+			if($this->logger){
+				$this->logger->error('Failed to execute query to check duplicate login identities.', ['exception' => $db_err]);
+			}
+			$this->errors[] = $this->lang['account_creation_unsuccessful'];
+			return false;
+			
 		}
 	
 	}
 	
-	public function register(){
+	public function generate_activation_code(){
 	
-	}
-	
-	public function username_check(){
-	
-	}
-	
-	public function email_check(){
-	
-	}
-	
-	public function identity_check(){
+		return sha1(md5(microtime()));
 	
 	}
 	
@@ -315,6 +540,14 @@ class AccountsManager{
 	
 		return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($key), base64_decode($data), MCRYPT_MODE_CBC, md5(md5($key))), "\0");
 	
+	}
+	
+	public function get_errors(){
+		if(!empty($this->errors)){
+			return $this->errors;
+		}else{
+			return false;
+		}
 	}
 
 }

@@ -9,7 +9,7 @@ use RBAC\Role\RoleSet;
 //this class extends the Subject which implements the SubjectInterface, it will contain all the methods necessary to interact with the logged in user!
 class UserAccount extends Subject{
 
-	protected $user_data;
+	protected $user_data = array();
 
 	public function __construct($subject_id, RoleSet $role_set = null){
 		parent::__construct($subject_id, $role_set);
@@ -28,7 +28,7 @@ class UserAccount extends Subject{
 	}
 	
 	public function set_user_data(array $data){
-		$this->user_data = $data;
+		$this->user_data = array_merge($this->user_data, $data);
 	}
 	
 	public function get_user_data(){
