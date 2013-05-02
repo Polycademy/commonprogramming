@@ -20,6 +20,7 @@ use PDO;
 use PDOException;
 
 //for sessions
+use PolyAuth\SessionInterface;
 use PolyAuth\CookieManager;
 use Aura\Session\Manager as SessionManager;
 use Aura\Session\SegmentFactory;
@@ -63,12 +64,14 @@ class AccountsManager{
 	protected $options;
 	
 	//expects PDO connection (potentially using $this->db->conn_id)
-	public function __construct($options = false, PDO $db, LoggerInterface $logger = null){
+	//SessionInterface is a copy of the PHP5.4.0 SessionHandlerInterface, this allows backwards compatibility
+	public function __construct($options = false, PDO $db, SessionInterface $session_handler = null, LoggerInterface $logger = null){
 	
 		$this->configure($options);
 	
 		$this->db = $db;
 		$this->logger = $logger;
+		$this->set_session_handler($session_handler);
 		$this->cookie_manager = new CookieManager(
 			$this->options['cookie_domain'],
 			$this->options['cookie_path'],
@@ -84,18 +87,34 @@ class AccountsManager{
 	
 	public function configure($options){
 		
+		$this->options = array(
+			//table options, see that the migration to be reflected. (RBAC options are not negotiable)
+			'table_users'			=> 'user_accounts',
+			'table_login_attempts'	=> 'login_attempts',
+			//cookie options
+			'cookie_domain'			=> '',
+			'cookie_path'			=> '/',
+			'cookie_prefix'			=> '',
+			'cookie_secure'			=> false,
+			'cookie_httponly'		=> false,
+		);
+		
 		if($options != false){
-			$this->options = $options;
-		}else{
-			//setup default options!
-			$this->options = array(
-				'cookie_domain'		=> '',
-				'cookie_path'		=> '/',
-				'cookie_prefix'		=> '',
-				'cookie_secure'		=> false,
-				'cookie_httponly'	=> false,
-			);
+			//this will override the default options
+			$this->options = array_merge($this->options, $options);
 		}
+	
+	}
+	
+	protected function set_session_handler($session_handler){
+	
+		if($session_handler === null){
+			return;
+		}
+		
+		//second parameter is to register the shutdown function
+		//make sure this runs before sessions are started
+		session_set_save_handler($session_handler, true);
 	
 	}
 	
