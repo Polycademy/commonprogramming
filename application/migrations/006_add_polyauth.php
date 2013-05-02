@@ -4,17 +4,20 @@ use RBAC\Permission;
 use RBAC\Role\Role;
 use RBAC\Manager\RoleManager;
 
-		//this migration will setup the tables for user accounts and login attempts
-		//it will not setup migrations for the sessions table, that is up to the end user, and to pass a session save handler object
-		
-		//modify these migrations to reflect extra fields that you want
-		//also we need to define default permissions, roles and associated users! (such as the first associated user for the admin!)
-		//nist level 1 means flat permissions
-		//we don't have hierarchy
-		//we assign a list of permissions to each role, and assign each role(s) to each user
-		
-		//role to permissions array, if you have complex authentication needs, make sure to plan out the map before you write this migration file
-		//however it is possible to edit the permission table later on with your own interface!
+/**
+ * This migration file is catered towards Codeigniter 3.0 and the MySQL database.
+ * However you can glean information from here on how to implement it in other frameworks and other databases.
+ * 
+ * This migration will not setup any sessions table, that's up to you to create if you want to use database sessions.
+ * 
+ * You will need to modify the configuration array to setup the default permissions and the default user.
+ * You can also add to the columns of the user_accounts table, or even change the name, just make sure to configure the name properly.
+ * Any added columns will simply be extra data that you can submit when registering or getting a user.
+ *
+ * Of course you can edit the roles and permissions later by constructing your own back end interface, or you can programmatically do it
+ *
+ * It is currently at NIST Level 1, so the user and role land is flat, no hierarchy yet.
+ */
 class Migration_add_polyauth extends CI_Migration {
 
 	public function up(){
@@ -32,11 +35,13 @@ class Migration_add_polyauth extends CI_Migration {
 			'active'				=> '1',
 		);
 		
+		//roles to descriptions
 		$default_roles = array(
 			'admin'		=> 'Site Administrators',
 			'member'	=> 'General Members',
 		);
 		
+		//roles to permissions to permission descriptions
 		$default_role_permissions = array(
 			'admin'		=> array(
 				'admin_create'	=> 'Creating administration resources.',
@@ -49,7 +54,7 @@ class Migration_add_polyauth extends CI_Migration {
 			),
 		);
 		
-		//1 indicates the first user (which is the first seeded user, which is probably the admin!)
+		//default user to roles
 		$default_user_roles = array(
 			$default_user['id']	=> array(
 				'admin',
