@@ -1,14 +1,61 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Migration_add_polyauth extends CI_Migration {
+use RBAC\Permission;
+use RBAC\Role\Role;
+use RBAC\Manager\RoleManager;
 
-	public function up(){
-	
 		//this migration will setup the tables for user accounts and login attempts
 		//it will not setup migrations for the sessions table, that is up to the end user, and to pass a session save handler object
 		
 		//modify these migrations to reflect extra fields that you want
-		//also we need to define default permissions, roles and associated users!
+		//also we need to define default permissions, roles and associated users! (such as the first associated user for the admin!)
+		//nist level 1 means flat permissions
+		//we don't have hierarchy
+		//we assign a list of permissions to each role, and assign each role(s) to each user
+		
+		//role to permissions array, if you have complex authentication needs, make sure to plan out the map before you write this migration file
+		//however it is possible to edit the permission table later on with your own interface!
+class Migration_add_polyauth extends CI_Migration {
+
+	public function up(){
+	
+		$default_user = array(
+			'id'					=> '1',
+			'ipAddress'				=> inet_pton('127.0.0.1'),
+			'username'				=> 'administrator',
+			'password'				=> '$2y$10$EiqipvSt3lnD//nchj4u9OgOTL9R3J4AbZ5bUVVrh.Tq/gmc5xIvS',
+			'email'					=> 'admin@admin.com',
+			'activationCode'		=> '',
+			'forgottenPasswordCode'	=> NULL,
+			'createdOn'				=> date('Y-m-d H:i:s'),
+			'lastLogin'				=> date('Y-m-d H:i:s'),
+			'active'				=> '1',
+		);
+		
+		$default_roles = array(
+			'admin'		=> 'Site Administrators',
+			'member'	=> 'General Members',
+		);
+		
+		$default_role_permissions = array(
+			'admin'		=> array(
+				'admin_create'	=> 'Creating administration resources.',
+				'admin_read'	=> 'Viewing administration resources.',
+				'admin_update'	=> 'Editing administration resources.',
+				'admin_delete'	=> 'Deleting administration resources.',
+			),
+			'member'	=> array(
+				'public_read'	=> 'Viewing public resources.',
+			),
+		);
+		
+		//1 indicates the first user (which is the first seeded user, which is probably the admin!)
+		$default_user_roles = array(
+			$default_user['id']	=> array(
+				'admin',
+				'member',
+			),
+		);
 		
 		// Table structure for table 'user_accounts'
 		$this->dbforge->add_field(array(
@@ -68,23 +115,12 @@ class Migration_add_polyauth extends CI_Migration {
 				'null' => TRUE
 			),
 		));
+		
 		$this->dbforge->add_key('id', TRUE);
 		$this->dbforge->create_table('user_accounts', true);
 		
 		// Dumping data for table 'users'
-		$data = array(
-			'id'					=> '1',
-			'ipAddress'				=> inet_pton('127.0.0.1'),
-			'username'				=> 'administrator',
-			'password'				=> '$2y$10$EiqipvSt3lnD//nchj4u9OgOTL9R3J4AbZ5bUVVrh.Tq/gmc5xIvS',
-			'email'					=> 'admin@admin.com',
-			'activationCode'		=> '',
-			'forgottenPasswordCode'	=> NULL,
-			'createdOn'				=> date('Y-m-d H:i:s'),
-			'lastLogin'				=> date('Y-m-d H:i:s'),
-			'active'				=> '1',
-		);
-		$this->db->insert('user_accounts', $data);
+		$this->db->insert('user_accounts', $default_user);
 		
 		// Table structure for table 'login_attempts'
 		$this->dbforge->add_field(array(
@@ -170,6 +206,42 @@ class Migration_add_polyauth extends CI_Migration {
 			ENGINE = InnoDB;';
 		
 		$this->db->query($create_auth_subject_role);
+		
+		//time to insert the default permission and role data
+		$role_manager = new RoleManager($this->db->conn_id);
+		
+		foreach($default_role_permissions as $role => $permissions_array){
+		
+			//create the role
+			$created_role = Role::create($role, $default_roles[$role]);
+			
+			foreach($permissions_array as $permission as $reason){
+
+				//create the permission
+				$created_permission = Permission::create($permission, $reason);
+				//save the permission to the database
+				$role_manager->permissionSave($created_permission);
+				//add the permission to the role
+				$created_role->addPermission($created_permission);
+				
+			}
+			
+			$role_manager->roleSave($created_role);
+			
+		}
+		
+		//assign the role to the default user
+		foreach($default_user_roles as $user => $roles){
+		
+			foreach($roles as $role){
+			
+				$assignable_role = $role_manager->roleFetchByName($role);
+				
+				$role_manager->roleAddSubjectId($assignable_role, $user);
+			
+			}
+		
+		}
 		
 	}
 
