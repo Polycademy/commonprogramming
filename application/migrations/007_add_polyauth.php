@@ -7,6 +7,8 @@ class Migration_add_polyauth extends CI_Migration {
 		//this migration will setup the tables for user accounts and login attempts
 		//it will not setup migrations for the sessions table, that is up to the end user, and to pass a session save handler object
 		
+		//modify these migrations to reflect extra fields that you want
+		
 		// Table structure for table 'user_accounts'
 		$this->dbforge->add_field(array(
 			'id' => array(
@@ -26,10 +28,6 @@ class Migration_add_polyauth extends CI_Migration {
 			'password' => array(
 				'type' => 'VARCHAR',
 				'constraint' => '255',
-			),
-			'salt' => array(
-				'type' => 'VARCHAR',
-				'constraint' => '40'
 			),
 			'email' => array(
 				'type' => 'VARCHAR',
@@ -57,15 +55,10 @@ class Migration_add_polyauth extends CI_Migration {
 				'null' => TRUE
 			),
 			'createdOn' => array(
-				'type' => 'INT',
-				'constraint' => '11',
-				'unsigned' => TRUE,
+				'type' => 'DATETIME',
 			),
 			'lastLogin' => array(
-				'type' => 'INT',
-				'constraint' => '11',
-				'unsigned' => TRUE,
-				'null' => TRUE
+				'type' => 'DATETIME',
 			),
 			'active' => array(
 				'type' => 'TINYINT',
@@ -73,37 +66,22 @@ class Migration_add_polyauth extends CI_Migration {
 				'unsigned' => TRUE,
 				'null' => TRUE
 			),
-			'firstName' => array(
-				'type' => 'VARCHAR',
-				'constraint' => '50',
-				'null' => TRUE
-			),
-			'lastName' => array(
-				'type' => 'VARCHAR',
-				'constraint' => '50',
-				'null' => TRUE
-			)
 		));
 		$this->dbforge->add_key('id', TRUE);
 		$this->dbforge->create_table('user_accounts', true);
 		
 		// Dumping data for table 'users'
 		$data = array(
-			'id' => '1',
-			'ipAddress' => inet_pton('127.0.0.1'),
-			'username' => 'administrator',
-			'password' => '$2a$07$SeBknntpZror9uyftVopmu61qg0ms8Qv1yV6FG.kQOSM.9QhmTo36',
-			'salt' => '9462e8eee0',
-			'email' => 'admin@admin.com',
-			'activationCode' => '',
-			'forgottenPasswordCode' => NULL,
-			'createdOn' => '1268889823',
-			'lastLogin' => '1268889823',
-			'active' => '1',
-			'firstName' => 'Admin',
-			'lastName' => 'istrator',
-			'company' => 'ADMIN',
-			'phone' => '0',
+			'id'					=> '1',
+			'ipAddress'				=> inet_pton('127.0.0.1'),
+			'username'				=> 'administrator',
+			'password'				=> '$2y$10$EiqipvSt3lnD//nchj4u9OgOTL9R3J4AbZ5bUVVrh.Tq/gmc5xIvS',
+			'email'					=> 'admin@admin.com',
+			'activationCode'		=> '',
+			'forgottenPasswordCode'	=> NULL,
+			'createdOn'				=> date('Y-m-d H:i:s'),
+			'lastLogin'				=> date('Y-m-d H:i:s'),
+			'active'				=> '1',
 		);
 		$this->db->insert('user_accounts', $data);
 		
@@ -125,10 +103,7 @@ class Migration_add_polyauth extends CI_Migration {
 				'null', TRUE
 			),
 			'time' => array(
-				'type' => 'INT',
-				'constraint' => '11',
-				'unsigned' => TRUE,
-				'null' => TRUE
+				'type' => 'DATETIME',
 			)
 		));
 		$this->dbforge->add_key('id', TRUE);
