@@ -25,7 +25,7 @@ class Migration_add_polyauth extends CI_Migration {
 			),
 			'password' => array(
 				'type' => 'VARCHAR',
-				'constraint' => '80',
+				'constraint' => '255',
 			),
 			'salt' => array(
 				'type' => 'VARCHAR',

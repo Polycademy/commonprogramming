@@ -35,6 +35,9 @@ use RBAC\Manager\RoleManager;
 //for logger
 use Psr\Log\LoggerInterface;
 
+//for security
+use PolyAuth\BcryptFallback;
+
 	//plans:
 	//consistent interface to RBAC
 	//registering users
@@ -62,6 +65,7 @@ class AccountsManager{
 	protected $logger;
 	protected $mailer;
 	protected $options;
+	protected $bcrypt_fallback = false;
 	
 	//expects PDO connection (potentially using $this->db->conn_id)
 	//SessionInterface is a copy of the PHP5.4.0 SessionHandlerInterface, this allows backwards compatibility
@@ -83,6 +87,10 @@ class AccountsManager{
 		$this->role_manager  = new RoleManager($db, $logger);
 		$this->mailer = new PHPMailer;
 		
+		if(version_compare(phpversion(), '5.3.7') < 0){
+			$this->bcrypt_fallback = new BcryptFallback($this->options['hash_rounds']);
+		}
+		
 	}
 	
 	public function configure($options){
@@ -91,6 +99,9 @@ class AccountsManager{
 			//table options, see that the migration to be reflected. (RBAC options are not negotiable)
 			'table_users'			=> 'user_accounts',
 			'table_login_attempts'	=> 'login_attempts',
+			//security options
+			'hash_method'			=> PASSWORD_DEFAULT,
+			'hash_rounds'			=> 8,
 			//cookie options
 			'cookie_domain'			=> '',
 			'cookie_path'			=> '/',
@@ -119,17 +130,34 @@ class AccountsManager{
 	}
 	
 	
+	public function hash_password($password, $method, $cost){
 	
+		if(!$this->bcrypt_fallback){
+			$hash = password_hash($password, $method, ['cost' => $cost]);
+		}else{
+			$hash = $this->bcrypt_fallback->hash($password);
+		}
+		return $hash;
+		
+	}
 	
+	public function hash_password_verify($password, $hash){
 	
-	
-	
-	
-	
-	
-	
-	
-	
+		if(!$this->bcrypt_fallback){
+			if(password_verify($password, $hash)){
+				return true;
+			} else {
+				return false;
+			}
+		}else{
+			if($this->bcrypt_fallback->verify($password, $hash)){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+	}
 	
 	
 	//it will be possible to encrypt sessions and decrypt sessions on the fly between the data transportation!
@@ -144,8 +172,7 @@ class AccountsManager{
 
 		var_dump($encrypted);
 		var_dump($decrypted);
-
-		ACTUALLY USE THIS INSTEAD: https://github.com/ircmaxell/password_compat
+		
 		*/
 	
 	}
