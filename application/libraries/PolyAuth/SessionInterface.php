@@ -2,6 +2,7 @@
 
 namespace PolyAuth;
 
+//if you're implementing the php 5.4 interface, then just implement both of them!
 interface SessionInterface{
 
 	abstract public bool close ( void )
