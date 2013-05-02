@@ -1,6 +1,6 @@
 <?php
 
-use RBAC\Role\Permission;
+use RBAC\Permission;
 use RBAC\Role\Role;
 use RBAC\Manager\RoleManager;
 

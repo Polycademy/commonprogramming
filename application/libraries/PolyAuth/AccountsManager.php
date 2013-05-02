@@ -28,7 +28,7 @@ use Aura\Session\CsrfTokenFactory;
 
 //for RBAC
 use PolyAuth\UserAccount;
-use RBAC\Role\Permission;
+use RBAC\Permission;
 use RBAC\Role\Role;
 use RBAC\Manager\RoleManager;
 
@@ -50,9 +50,10 @@ class AccountsManager{
 	protected $cookie_manager;
 	protected $session_manager;
 	protected $role_manager;
-	protected $user;
 	protected $mailer;
 	protected $bcrypt_fallback = false;
+	
+	protected $user_account; //this is used to represent the user account for the RBAC, it is only initialised when a person logs in or registers
 	
 	//expects PDO connection (potentially using $this->db->conn_id)
 	//SessionInterface is a copy of the PHP5.4.0 SessionHandlerInterface, this allows backwards compatibility
@@ -73,7 +74,6 @@ class AccountsManager{
 		);
 		$this->session_manager = new SessionManager(new SegmentFactory, new CsrfTokenFactory);
 		$this->role_manager  = new RoleManager($db, $logger);
-		$this->user = new UserAccount;
 		$this->mailer = new PHPMailer;
 		
 		//if you use bcrypt fallback, you must always use bcrypt fallback, you cannot switch servers!

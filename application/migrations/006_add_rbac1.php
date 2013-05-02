@@ -49,20 +49,20 @@ class Migration_add_rbac1 extends CI_Migration {
 		
 		$this->db->query($create_auth_role_permissions);
 		
-		$create_auth_role = 
-			'CREATE TABLE `auth_user_role` (
-				`user_role_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-				`user_id`      INT(10) UNSIGNED NOT NULL,
-				`role_id`      INT(10) UNSIGNED NOT NULL,
-				PRIMARY KEY (`user_role_id`),
+		$create_auth_subject_role = 
+			'CREATE TABLE `auth_subject_role` (
+				`subject_role_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+				`subject_id`      INT(10) UNSIGNED NOT NULL,
+				`role_id`         INT(10) UNSIGNED NOT NULL,
+				PRIMARY KEY (`subject_role_id`),
 				FOREIGN KEY (`role_id`) REFERENCES `auth_role` (`role_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-				UNIQUE INDEX `role_id` USING BTREE (`role_id`, `user_id`),
-				INDEX `fk_userid` USING BTREE (`user_id`),
+				UNIQUE INDEX `role_id` USING BTREE (`role_id`, `subject_id`),
+				INDEX `fk_subjectid` USING BTREE (`subject_id`),
 				INDEX `fk_roleid` USING BTREE (`role_id`)
 			)
 			ENGINE = InnoDB;';
 		
-		$this->db->query($create_auth_role);
+		$this->db->query($create_auth_subject_role);
 		
 	}
 
@@ -73,7 +73,7 @@ class Migration_add_rbac1 extends CI_Migration {
 		$this->dbforge->drop_table('auth_permission');
 		$this->dbforge->drop_table('auth_role');
 		$this->dbforge->drop_table('auth_role_permissions');
-		$this->dbforge->drop_table('auth_user_role');
+		$this->dbforge->drop_table('auth_subject_role');
 		$this->db->query('SET foreign_key_checks = 1;');
 	
 	}

@@ -1080,16 +1080,16 @@
         },
         {
             "name": "ircmaxell/password-compat",
-            "version": "1.0.0",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ircmaxell/password_compat.git",
-                "reference": "v1.0.0"
+                "reference": "v1.0.3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/ircmaxell/password_compat/archive/v1.0.0.zip",
-                "reference": "v1.0.0",
+                "url": "https://api.github.com/repos/ircmaxell/password_compat/zipball/v1.0.3",
+                "reference": "v1.0.3",
                 "shasum": ""
             },
             "type": "library",
@@ -1115,7 +1115,7 @@
                 "hashing",
                 "password"
             ],
-            "time": "2013-01-14 16:49:31"
+            "time": "2013-04-30 19:58:08"
         },
         {
             "name": "jamierumbelow/pigeon",
@@ -1212,12 +1212,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/leighmacdonald/php_rbac.git",
-                "reference": "41b5cb4a223f0b7b808d7d1bf9262f7ef69dd001"
+                "reference": "9802bd073fea86b43f5d1418c91eab640936e151"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/leighmacdonald/php_rbac/zipball/41b5cb4a223f0b7b808d7d1bf9262f7ef69dd001",
-                "reference": "41b5cb4a223f0b7b808d7d1bf9262f7ef69dd001",
+                "url": "https://api.github.com/repos/leighmacdonald/php_rbac/zipball/9802bd073fea86b43f5d1418c91eab640936e151",
+                "reference": "9802bd073fea86b43f5d1418c91eab640936e151",
                 "shasum": ""
             },
             "require": {
@@ -1255,7 +1255,7 @@
                 "database",
                 "rbac"
             ],
-            "time": "2013-04-29 06:49:44"
+            "time": "2013-04-30 07:25:58"
         },
         {
             "name": "monolog/monolog",
