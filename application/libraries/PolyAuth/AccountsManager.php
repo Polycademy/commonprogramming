@@ -53,7 +53,7 @@ class AccountsManager{
 	protected $mailer;
 	protected $bcrypt_fallback = false;
 	
-	protected $user; //this is used to represent the user account for the RBAC, it is only initialised when a person logs in or registers
+	protected $user; //this is used to represent the user account for the RBAC, it is only initialised when a person logs in, it is not be used for any other purposes, always must represent the currently logged in user
 	
 	protected $errors = array();
 	
@@ -121,8 +121,8 @@ class AccountsManager{
 			'email_cc'							=> false,
 			'email_bcc'							=> false,
 			'email_type'						=> 'html', //can be text or html
-			'email_activation_template'			=> 'Here is your activation code: {{activation_code}}',
-			'email_forgotten_template'			=> 'Here is your temporary login: {{temporary_login_code}}',
+			'email_activation_template'			=> 'Here is your activation code: {{activation_code}} and here is your user id: {{user_id}}. Here is an example link http://example.com/?activation_code={{activation_code}}&user_id={{user_id}}',
+			'email_forgotten_template'			=> 'Here is your temporary login: {{temporary_login_code}} and here is your user id: {{user_id}}. Here is an example link Here is an example link http://example.com/?temporary_login_code={{temporary_login_code}}&user_id={{user_id}}',
 			//rbac options (initial roles from the migration, also who's the default role, and root access role?)
 			'role_default'						=> 'members',
 			//login options (this is the field used to login with, plus login attempts)
@@ -203,10 +203,8 @@ class AccountsManager{
 		);
 		
 		//inserting activation code into the users table, if the reg_activation is by email
-		$activation_code = false;
 		if($this->options['reg_activation'] == 'email'){
-			$activation_code = $this->generate_activation_code();
-			$data['activationCode'] = $activation_code; 
+			$data['activationCode'] = $this->generate_activation_code(); 
 		}
 		
 		$column_string = implode(',', array_keys($data));
@@ -230,15 +228,16 @@ class AccountsManager{
 			
 		}
 		
+		$registered_user = new UserAccount($last_insert_id);
+		unset($data['password']);
+		$registered_user->set_user_data($data);
+		
 		//now we've got to add the default roles and permissions
-		if(!$this->register_roles($last_insert_id, array($this->options['role_default']))){
+		if(!$registered_user = $this->register_roles($registered_user, array($this->options['role_default']))){
 			return false;
 		}
 		
-		//we should get back a $user with the role set defined, here we're initialising the user with the login data minus the password hash
-		unset($data['password']);
-		$this->user->set_user_data($data);
-		return $this->user;
+		return $registered_user;
 		
 	}
 	
@@ -262,7 +261,8 @@ class AccountsManager{
 				//fetch a single row
 				$row = $sth->fetch(PDO::FETCH_OBJ);
 				
-				//use sprintf to insert activation code
+				//use sprintf to insert activation code and user id
+				$body = sprintf(str_replace('{{user_id}}','\'%1$s\'', $body), $user_id);
 				$body = sprintf(str_replace('{{activation_code}}','\'%1$s\'', $body), $row->activationCode);
 				
 				//send email via PHPMailer
@@ -328,22 +328,20 @@ class AccountsManager{
 	}
 	
 	//takes a user id and role object, and adds it to the user and saves it, the role object should have a list of permissions
-	public function register_roles($user_id, array $role_names){
-	
-		$this->user = new UserAccount($user_id);
+	public function register_roles(UserAccount $user, array $role_names){
 		
 		foreach($role_names as $role_name){
 		
 			$role = $this->role_manager->roleFetchByName($role_name);
 			
-			if(!$this->role_manager->roleAddSubject($role, $this->user)){
+			if(!$this->role_manager->roleAddSubject($role, $user)){
 				$this->errors[] = $this->lang['account_creation_assign_role'];
 				return false;
 			}
 			
 		}
 		
-		return $this->user;
+		return $user;
 	
 	}
 	
@@ -393,7 +391,10 @@ class AccountsManager{
 	
 	}
 	
-	public function activate(){
+	//given the activation code and user id?
+	public function activate($user_id, $activation_code){
+	
+		//if the activation code matches with the user_id's activation code, then update the row to make it active!
 	
 	}
 	
