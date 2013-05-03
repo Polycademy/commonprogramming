@@ -2,44 +2,38 @@
 
 //RBAC SQL with Configuration
 //PolyAuth SQL with Configuration
-	//Username
-	//Password
-	//Email
-	//Custom Data.. specified by SQL schema (allow any number of it)
-//both are using Codeigniter's migrations?
 //requires PDO
 //requires Aura Session
 //requires RBAC
 //requires password_compat (this will be loaded automatically and will be available until 5.5)
 //requires PSR's logger
 
-namespace PolyAuth;
+namespace PolyAuth\Accounts;
 
 //for database
 use PDO;
 use PDOException;
 
-//for sessions
-use PolyAuth\SessionInterface;
-use PolyAuth\CookieManager;
-use Aura\Session\Manager as SessionManager;
-use Aura\Session\SegmentFactory;
-use Aura\Session\CsrfTokenFactory;
-
-//for RBAC
-use PolyAuth\UserAccount;
-use RBAC\Permission;
-use RBAC\Role\Role;
-use RBAC\Manager\RoleManager;
-
 //for logger
 use Psr\Log\LoggerInterface;
+
+//for options
+use PolyAuth\Options;
+
+//for languages
+use PolyAuth\Language;
 
 //for security
 use PolyAuth\BcryptFallback;
 
-//for languages
-use PolyAuth\Language;
+//for registration
+use PolyAuth\Emailer;
+
+//for RBAC (to CRUD roles and permissions)
+use PolyAuth\UserAccount;
+use RBAC\Permission;
+use RBAC\Role\Role;
+use RBAC\Manager\RoleManager;
 
 class AccountsManager{
 
@@ -59,9 +53,10 @@ class AccountsManager{
 	
 	//expects PDO connection (potentially using $this->db->conn_id)
 	//SessionInterface is a copy of the PHP5.4.0 SessionHandlerInterface, this allows backwards compatibility
-	public function __construct($options = false, PDO $db, SessionInterface $session_handler = null, LoggerInterface $logger = null){
+	public function __construct(PDO $db, Options $options, SessionInterface $session_handler = null, LoggerInterface $logger = null){
 	
-		$this->configure($options);
+		//options object which is implmented as an array
+		$this->options = $options;
 		$this->lang = new Language;
 		
 		$this->db = $db;
@@ -76,7 +71,7 @@ class AccountsManager{
 		);
 		$this->session_manager = new SessionManager(new SegmentFactory, new CsrfTokenFactory);
 		$this->role_manager  = new RoleManager($db, $logger);
-		$this->mailer = new PHPMailer;
+		$this->mailer = new Emailer($this->options);
 		
 		//if you use bcrypt fallback, you must always use bcrypt fallback, you cannot switch servers!
 		if($this->options['hash_fallback']){
@@ -85,77 +80,6 @@ class AccountsManager{
 		
 		$this->startyourengines();
 		
-	}
-	
-	public function configure($options){
-		
-		$this->options = array(
-			//table options, see that the migration to be reflected. (RBAC options are not negotiable)
-			'table_users'						=> 'user_accounts',
-			'table_login_attempts'				=> 'login_attempts',
-			//security options
-			'hash_fallback'						=> false, //set whether to use bcrypt fallback (if you're behind 5.3.7 in PHP version, this will not seamlessly upgrade, if you switch PHP versions, make sure to rehash your passwords manually)
-			'hash_method'						=> PASSWORD_DEFAULT,	//can be PASSWORD_DEFAULT or PASSWORD_BCRYPT
-			'hash_rounds'						=> 10,
-			//session options
-			'session_encrypt'					=> true, //should the session data be encrypted? (only for the cookie)
-			'session_key'						=> 'hiddenpassword', //session encryption key, any number of characters and depends on session_encrypt
-			//cookie options
-			'cookie_domain'						=> '',
-			'cookie_path'						=> '/',
-			'cookie_prefix'						=> '',
-			'cookie_secure'						=> false,
-			'cookie_httponly'					=> false,
-			//email options (email data should be passed in as a string, end user manages their own stuff)
-			'email'								=> false, //make this true to use the emails by PHPMailer, otherwise false if you want to roll your own email solution, watch out for email activation
-			'email_smtp'						=> false,
-			'email_host'						=> '',
-			'email_auth'						=> false,
-			'email_username'					=> '',
-			'email_password'					=> '',
-			'email_smtp_secure'					=> '', //tls or ssl or false
-			'email_from'						=> 'enquiry@polycademy.com',
-			'email_from_name'					=> 'Polycademy',
-			'email_replyto'						=> false, //can be an email or false
-			'email_replyto_name'				=> '',
-			'email_cc'							=> false,
-			'email_bcc'							=> false,
-			'email_type'						=> 'html', //can be text or html
-			'email_activation_template'			=> 'Here is your activation code: {{activation_code}} and here is your user id: {{user_id}}. Here is an example link http://example.com/?activation_code={{activation_code}}&user_id={{user_id}}',
-			'email_forgotten_template'			=> 'Here is your temporary login: {{temporary_login_code}} and here is your user id: {{user_id}}. Here is an example link Here is an example link http://example.com/?temporary_login_code={{temporary_login_code}}&user_id={{user_id}}',
-			//rbac options (initial roles from the migration, also who's the default role, and root access role?)
-			'role_default'						=> 'members',
-			//login options (this is the field used to login with, plus login attempts)
-			'login_identity'					=> 'username', //can be email or username
-			'login_password_minlength'			=> 8,
-			'login_password_maxlength'			=> 20,
-			'login_persistent'					=> true, //allowing remember me or not
-			'login_expiration'					=> 86500, // How long to remember the user (seconds). Set to zero for no expiration
-			'login_expiration_extend'			=> true, //allowing whether autologin extends the login_expiration
-			'login_attempts'					=> 0, //if 0, then it is disabled
-			'login_lockout'						=> 0, //lockout time in seconds
-			'login_forgot_password_expiration'	=> 0, //how long before the temporary password expires
-			//registration options
-			'reg_activation'					=> false, //can be email, manual, or false
-		);
-		
-		if($options != false){
-			//this will override the default options
-			$this->options = array_merge($this->options, $options);
-		}
-	
-	}
-	
-	protected function set_session_handler($session_handler){
-	
-		if($session_handler === null){
-			return;
-		}
-		
-		//second parameter is to register the shutdown function
-		//make sure this runs before sessions are started
-		session_set_save_handler($session_handler, true);
-	
 	}
 	
 	protected function startyourengines(){
@@ -241,92 +165,6 @@ class AccountsManager{
 		
 	}
 	
-	//assume $body has {{activation_code}}
-	//this can be sent multiple times, the activation code doesn't change (so the concept of resend activation email)
-	public function send_activation_email($user_id, $subject = false, $body = false, $alt_body = false){
-	
-		if($this->options['reg_activation'] == 'email' AND $this->options['email']){
-		
-			$subject = (empty($subject)) ? $this->lang('email_activation_subject') : $subject;
-			$body = (empty($body)) ? $this->options['email_activation_template'] : $body;
-			
-			//take the user_id, grab the person's email and activation_code
-			$query = "SELECT email, activationCode FROM {$this->options['table_users']} WHERE id = :id";
-			$sth = $this->db->prepare($query);
-			$sth->bindParam(':id', $user_id, PDO::PARAM_INT);
-			
-			try{
-				
-				$sth->execute();
-				//fetch a single row
-				$row = $sth->fetch(PDO::FETCH_OBJ);
-				
-				//use sprintf to insert activation code and user id
-				$body = sprintf(str_replace('{{user_id}}','\'%1$s\'', $body), $user_id);
-				$body = sprintf(str_replace('{{activation_code}}','\'%1$s\'', $body), $row->activationCode);
-				
-				//send email via PHPMailer
-				if(!$this->send_mail($row->email, $subject, $body, $alt_body)){
-					if($this->logger){
-						$this->logger->error('Failed to send activation email.');
-					}
-					$this->errors[] = $this->lang['activation_email_unsuccessful'];
-					return false;
-				}
-				
-				return true;
-				
-			}catch(PDOException $db_err){
-			
-				if($this->logger){
-					$this->logger->error('Failed to execute query to fetch email and activation code given a user id.', ['exception' => $db_err]);
-				}
-				$this->errors[] = $this->lang['activation_email_unsuccessful'];
-				return false;
-				
-			}
-		
-		}else{
-		
-			return false;
-		
-		}
-		
-	}
-	
-	public function send_mail($email_to, $subject, $body, $alt_body = false){
-	
-		if($this->options['email_smtp']){
-			$this->mailer->IsSMTP();
-			$this->mailer->Host = $this->options['email_host'];
-			if($this->options['email_auth']){
-				$this->mailer->SMTPAuth = true;
-				$this->mailer->Username = $this->options['email_username'];
-				$this->mailer->Password = $this->options['email_password'];
-			}
-			if($this->options['email_smtp_secure']) $this->mailer->SMTPSecure = $this->options['email_smtp_secure'];
-		}
-		
-		$this->mailer->From = $this->options['email_from'];
-		$this->mailer->FromName = $this->options['email_from_name'];
-		$this->mailer->AddAddress($email_to);
-		if($this->options['email_replyto']) $this->mailer->AddReplyTo($this->options['email_replyto'], $this->options['email_replyto_name']);
-		if($this->options['email_cc']) $this->mailer->AddCC($this->options['email_cc']);
-		if($this->options['email_bcc']) $this->mailer->AddBCC($this->options['email_bcc']);
-		if($this->options['email_html']) $this->mailer->IsHTML(true);
-		
-		$this->mailer->Subject = $subject;
-		$this->mailer->Body = $body;
-		if($alt_body) $this->mailer->AltBody = $alt_body;
-		
-		if(!$mail->Send()){
-			return false;
-		}
-		
-		return true;
-	
-	}
-	
 	//takes a user id and role object, and adds it to the user and saves it, the role object should have a list of permissions
 	public function register_roles(UserAccount $user, array $role_names){
 		
@@ -364,7 +202,7 @@ class AccountsManager{
 		$sth->bindParam(':identity', $identity, PDO::PARAM_STR);
 		
 		try {
-
+		
 			//there basically should be nothing returned, if something is returned then identity check fails
 			$sth->execute();
 			if($sth->fetch(PDO::FETCH_NUM) > 0){

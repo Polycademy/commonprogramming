@@ -91,12 +91,12 @@ class Migration_add_polyauth extends CI_Migration {
 				'constraint' => '40',
 				'null' => TRUE
 			),
-			'forgottenPasswordCode' => array(
+			'forgottenCode' => array(
 				'type' => 'VARCHAR',
 				'constraint' => '40',
 				'null' => TRUE
 			),
-			'forgottenPasswordTime' => array(
+			'forgottenTime' => array(
 				'type' => 'INT',
 				'constraint' => '11',
 				'unsigned' => TRUE,
