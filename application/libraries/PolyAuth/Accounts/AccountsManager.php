@@ -37,61 +37,33 @@ use RBAC\Manager\RoleManager;
 
 class AccountsManager{
 
+	protected $db;
 	protected $options;
 	protected $lang;
-	protected $db;
 	protected $logger;
-	protected $cookie_manager;
-	protected $session_manager;
 	protected $role_manager;
-	protected $mailer;
+	protected $emailer;
 	protected $bcrypt_fallback = false;
-	
-	protected $user; //this is used to represent the user account for the RBAC, it is only initialised when a person logs in, it is not be used for any other purposes, always must represent the currently logged in user
 	
 	protected $errors = array();
 	
 	//expects PDO connection (potentially using $this->db->conn_id)
 	//SessionInterface is a copy of the PHP5.4.0 SessionHandlerInterface, this allows backwards compatibility
-	public function __construct(PDO $db, Options $options, SessionInterface $session_handler = null, LoggerInterface $logger = null){
+	public function __construct(PDO $db, Options $options, LoggerInterface $logger = null){
 	
-		//options object which is implmented as an array
 		$this->options = $options;
 		$this->lang = new Language;
 		
 		$this->db = $db;
 		$this->logger = $logger;
-		$this->set_session_handler($session_handler);
-		$this->cookie_manager = new CookieManager(
-			$this->options['cookie_domain'],
-			$this->options['cookie_path'],
-			$this->options['cookie_prefix'],
-			$this->options['cookie_secure'],
-			$this->options['cookie_httponly']
-		);
-		$this->session_manager = new SessionManager(new SegmentFactory, new CsrfTokenFactory);
 		$this->role_manager  = new RoleManager($db, $logger);
-		$this->mailer = new Emailer($this->options);
+		$this->emailer = new Emailer($this->options);
 		
 		//if you use bcrypt fallback, you must always use bcrypt fallback, you cannot switch servers!
 		if($this->options['hash_fallback']){
 			$this->bcrypt_fallback = new BcryptFallback($this->options['hash_rounds']);
 		}
 		
-		$this->startyourengines();
-		
-	}
-	
-	protected function startyourengines(){
-	
-		//immediately logs the person in if they have identity, rememberCode and are not currently logged in
-		if(!$this->logged_in() && $this->cookie_manager->get_cookie('identity') && $this->cookie_manager->get_cookie('rememberCode')){
-			$this->login_remembered_user();
-		}
-		
-		//... continue
-		
-	
 	}
 	
 	//let's provide some registration
@@ -324,39 +296,8 @@ class AccountsManager{
 	
 	}
 	
-	public function login(){
-	
-	}
-	
-	public function login_remembered_user(){
-	
-	}
-	
-	public function is_max_login_attempts_exceeded(){
-	
-	}
-	
-	public function get_last_attempt_time(){
-	
-	}
-	
-	public function get_attempts_num(){
-	
-	}
-	
-	public function is_time_locked_out(){
-	
-	}
-	
-	public function clear_login_attempts(){
-	
-	}
-	
-	public function logged_in(){
-	
-	}
-	
-	public function logout(){
+	//forgot identity or password
+	public function forgotten_identity(){
 	
 	}
 	
@@ -364,15 +305,16 @@ class AccountsManager{
 	
 	}
 	
-	public function forgotten_password_complete(){
+	//checks if the OTP is correct and within the time limit
+	public function forgotten_check(){
 	
 	}
 	
-	public function forgotten_password_check(){
+	public function forgotten_complete(){
 	
 	}
 	
-	public function clear_forgotten_password_code(){
+	public function clear_forgotten(){
 	
 	}
 	
@@ -384,7 +326,6 @@ class AccountsManager{
 	
 	}
 	
-	//get the currently logged in user, if the user is not logged in, gets the current session
 	public function get_user(){
 	
 		//return the RBAC user object, which you can test for permissions or grab its user data or session data
@@ -451,18 +392,6 @@ class AccountsManager{
 			}
 		}
 		
-	}
-	
-	public function encrypt_session($data, $key){
-
-		return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, md5($key), $data, MCRYPT_MODE_CBC, md5(md5($key))));
-
-	}
-	
-	public function decrypt_session($data, $key){
-	
-		return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($key), base64_decode($data), MCRYPT_MODE_CBC, md5(md5($key))), "\0");
-	
 	}
 	
 	public function get_errors(){

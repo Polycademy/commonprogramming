@@ -18,10 +18,13 @@ use PolyAuth\Language;
 //this class handles the sending of emails
 class Emailer{
 
-	protected $mailer;
-	protected $options;
 	protected $db;
+	protected $options;
+	protected $lang;
 	protected $logger;
+	protected $mailer;
+	
+	protected $errors = array();
 
 	public function __construct(PDO $db, Options $options, LoggerInterface $logger = null){
 	
@@ -139,6 +142,14 @@ class Emailer{
 		
 		return true;
 	
+	}
+	
+	public function get_errors(){
+		if(!empty($this->errors)){
+			return $this->errors;
+		}else{
+			return false;
+		}
 	}
 
 }
