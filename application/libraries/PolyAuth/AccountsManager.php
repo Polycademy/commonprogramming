@@ -253,7 +253,7 @@ class AccountsManager{
 			//take the user_id, grab the person's email and activation_code
 			$query = "SELECT email, activationCode FROM {$this->options['table_users']} WHERE id = :id";
 			$sth = $this->db->prepare($query);
-			$sth = $this->db->bindParam(':id', $user_id, PDO::PARAM_INT);
+			$sth->bindParam(':id', $user_id, PDO::PARAM_INT);
 			
 			try{
 				
@@ -361,7 +361,7 @@ class AccountsManager{
 		
 		$query = "SELECT id FROM {$this->options['table_users']} WHERE {$this->options['login_identity']} = :identity";
 		$sth = $this->db->prepare($query);
-		$sth = $this->db->bindParam(':identity', $identity, PDO::PARAM_STR);
+		$sth->bindParam(':identity', $identity, PDO::PARAM_STR);
 		
 		try {
 
@@ -392,13 +392,18 @@ class AccountsManager{
 	}
 	
 	//given the activation code and user id?
-	public function activate($user_id, $activation_code){
+	public function activate($user_id, $activation_code = false){
+	
+		if(!$activation_code){
+			//force activate (if the activation code doesn't exist)
+			return $this->force_activate($user_id);
+		}
 	
 		//if the activation code matches with the user_id's activation code, then update the row to make it active!
 		$query = "SELECT id from {$this->options['table_users']} WHERE id = :id AND activationCode = :activation_code";
 		$sth = $this->db->prepare($query);
-		$sth = $this->db->bindParam(':id', $user_id, PDO::PARAM_INT);
-		$sth = $this->db->bindParam(':activation_code', $user_id, PDO::PARAM_STR);
+		$sth->bindParam(':id', $user_id, PDO::PARAM_INT);
+		$sth->bindParam(':activation_code', $user_id, PDO::PARAM_STR);
 		
 		try{
 		
@@ -406,30 +411,16 @@ class AccountsManager{
 			$sth->execute();
 			
 			if($sth->fetch(PDO::FETCH_NUM) > 0){
+			
 				//we got a match, let's activate them!
-				$query = "UPDATE {$this->options['table_users']} SET active = 1, activationCode = '' WHERE id = :id";
-				$sth = $this->db->prepare($query);
-				$sth = $this->db->bindParam(':id', $user_id, PDO::PARAM_INT);
-				
-				try{
-				
-					$sth->execute();
-					return true;
-				
-				}catch(PDOException $db_err){
-				
-					if($this->logger){
-						$this->logger->error("Failed to execute query to activate user $user_id.", ['exception' => $db_err]);
-					}
-					$this->errors[] = $this->lang['activate_unsuccessful'];
-					return false;
-				
-				}
+				return $this->force_activate($user_id);
 				
 			}else{
+			
 				//no match, no activation
 				$this->errors[] = $this->lang['activate_unsuccessful'];
 				return false;
+				
 			}
 		
 		}catch(PDOException $db_err){
@@ -444,7 +435,54 @@ class AccountsManager{
 	
 	}
 	
-	public function deactivate(){
+	protected function force_activate($user_id){
+	
+		$query = "UPDATE {$this->options['table_users']} SET active = 1, activationCode = '' WHERE id = :id";
+		$sth = $this->db->prepare($query);
+		$sth->bindParam(':id', $user_id, PDO::PARAM_INT);
+		
+		try{
+		
+			$sth->execute();
+			return true;
+		
+		}catch(PDOException $db_err){
+		
+			if($this->logger){
+				$this->logger->error("Failed to execute query to activate user $user_id.", ['exception' => $db_err]);
+			}
+			$this->errors[] = $this->lang['activate_unsuccessful'];
+			return false;
+		
+		}
+		
+	}
+	
+	//deactivates based on a user_id
+	public function deactivate($user_id){
+	
+		//generate new activation code and return it if it was successful
+		$activation_code = generate_activation_code();
+		$query = "UPDATE {$this->options['table_users']} SET active = 0, activationCode = :activation_code WHERE id = :id";
+		$sth = $this->db->prepare($query);
+		$sth->bindParam(':activation_code', $activation_code, PDO::PARAM_STR);
+		$sth->bindParam(':id', $user_id, PDO::PARAM_INT);
+		
+		try{
+		
+			$sth->execute();
+			return $activation_code;
+		
+		}catch(PDOException $db_err){
+		
+			if($this->logger){
+				$this->logger->error("Failed to execute query to deactivate user $user_id.", ['exception' => $db_err]);
+			}
+			$this->errors[] = $this->lang['deactivate_unsuccessful'];
+			return false;
+		
+		}
+		
 	
 	}
 	
