@@ -270,7 +270,7 @@ class AccountsManager{
 					if($this->logger){
 						$this->logger->error('Failed to send activation email.');
 					}
-					$this->errors[] = $this->lang['email_activation_email_unsent'];
+					$this->errors[] = $this->lang['activation_email_unsuccessful'];
 					return false;
 				}
 				
@@ -281,7 +281,7 @@ class AccountsManager{
 				if($this->logger){
 					$this->logger->error('Failed to execute query to fetch email and activation code given a user id.', ['exception' => $db_err]);
 				}
-				$this->errors[] = $this->lang['email_activation_email_unsent'];
+				$this->errors[] = $this->lang['activation_email_unsuccessful'];
 				return false;
 				
 			}
@@ -395,6 +395,52 @@ class AccountsManager{
 	public function activate($user_id, $activation_code){
 	
 		//if the activation code matches with the user_id's activation code, then update the row to make it active!
+		$query = "SELECT id from {$this->options['table_users']} WHERE id = :id AND activationCode = :activation_code";
+		$sth = $this->db->prepare($query);
+		$sth = $this->db->bindParam(':id', $user_id, PDO::PARAM_INT);
+		$sth = $this->db->bindParam(':activation_code', $user_id, PDO::PARAM_STR);
+		
+		try{
+		
+			//test if there are any results
+			$sth->execute();
+			
+			if($sth->fetch(PDO::FETCH_NUM) > 0){
+				//we got a match, let's activate them!
+				$query = "UPDATE {$this->options['table_users']} SET active = 1, activationCode = '' WHERE id = :id";
+				$sth = $this->db->prepare($query);
+				$sth = $this->db->bindParam(':id', $user_id, PDO::PARAM_INT);
+				
+				try{
+				
+					$sth->execute();
+					return true;
+				
+				}catch(PDOException $db_err){
+				
+					if($this->logger){
+						$this->logger->error("Failed to execute query to activate user $user_id.", ['exception' => $db_err]);
+					}
+					$this->errors[] = $this->lang['activate_unsuccessful'];
+					return false;
+				
+				}
+				
+			}else{
+				//no match, no activation
+				$this->errors[] = $this->lang['activate_unsuccessful'];
+				return false;
+			}
+		
+		}catch(PDOException $db_err){
+		
+			if($this->logger){
+				$this->logger->error('Failed to execute query to grab the user with the relevant id and activation code.', ['exception' => $db_err]);
+			}
+			$this->errors[] = $this->lang['activate_unsuccessful'];
+			return false;
+		
+		}
 	
 	}
 	

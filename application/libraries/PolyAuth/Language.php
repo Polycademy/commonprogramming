@@ -49,7 +49,6 @@ class Language implements \ArrayAccess{
 			'role_delete_unsuccessful'				=> 'Unable to delete group',
 			//email
 			'email_activation_subject'				=> 'Account Activation Email',
-			'email_activation_email_unsent'			=> 'The account activation email failed to be sent.',
 		);
 	
 	}

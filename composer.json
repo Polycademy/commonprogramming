@@ -1,16 +1,6 @@
 {
     "require":{
 		"monolog/monolog": "*",
-		"firephp/firephp-core": "dev-master",
-        "behat/behat": "2.4.*@stable",
-        "behat/mink-extension": "*",
-        "behat/mink": "1.4@stable",
-        "behat/mink-goutte-driver": "*",
-        "behat/mink-selenium-driver": "*",
-        "behat/mink-selenium2-driver": "*",
-        "behat/mink-sahi-driver": "*",
-        "behat/mink-zombie-driver": "*",
-        "phpunit/phpunit": "3.7.*",
 		"cboden/Ratchet": "*",
 		"react/zmq": "dev-master",
 		"pimple/pimple": "*",
@@ -22,6 +12,19 @@
 		"ircmaxell/password-compat": "*",
 		"phpmailer/phpmailer": "5.2.*",
 		"psr/log": "1.0.0"
+	},
+	"require-dev":{
+		"firephp/firephp-core": "dev-master",
+        "behat/behat": "2.4.*@stable",
+        "behat/mink-extension": "*",
+        "behat/mink": "1.4@stable",
+        "behat/mink-goutte-driver": "*",
+        "behat/mink-selenium-driver": "*",
+        "behat/mink-selenium2-driver": "*",
+        "behat/mink-sahi-driver": "*",
+        "behat/mink-zombie-driver": "*",
+        "phpunit/phpunit": "3.*",
+		"phpunit/dbunit": ">=1.2"
 	},
     "config": {
         "bin-dir": "bin/"
