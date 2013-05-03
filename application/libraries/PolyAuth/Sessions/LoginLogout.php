@@ -37,6 +37,7 @@ class LoginLogout{
 	protected $options;
 	protected $lang;
 	protected $logger;
+	protected $session_manager;
 	protected $role_manager;
 	protected $bcrypt_fallback = false;
 	

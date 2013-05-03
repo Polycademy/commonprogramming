@@ -1,13 +1,5 @@
 <?php
 
-//RBAC SQL with Configuration
-//PolyAuth SQL with Configuration
-//requires PDO
-//requires Aura Session
-//requires RBAC
-//requires password_compat (this will be loaded automatically and will be available until 5.5)
-//requires PSR's logger
-
 namespace PolyAuth\Accounts;
 
 //for database
@@ -57,7 +49,7 @@ class AccountsManager{
 		$this->db = $db;
 		$this->logger = $logger;
 		$this->role_manager  = new RoleManager($db, $logger);
-		$this->emailer = new Emailer($this->options);
+		$this->emailer = new Emailer($db, $options, $logger);
 		
 		//if you use bcrypt fallback, you must always use bcrypt fallback, you cannot switch servers!
 		if($this->options['hash_fallback']){
@@ -110,7 +102,7 @@ class AccountsManager{
 		$sth = $this->db->prepare($query);
 		
 		try {
-
+		
 			$sth->execute(array_values($data));
 			$last_insert_id = $sth->lastInsertId();
 			
@@ -122,6 +114,11 @@ class AccountsManager{
 			$this->errors[] = $this->lang['account_creation_unsuccessful'];
 			return false;
 			
+		}
+		
+		//automatically send the activation email
+		if($this->options['reg_activation'] == 'email' AND $this->options['email']){
+			$this->emailer->send_activation_email($last_insert_id);
 		}
 		
 		$registered_user = new UserAccount($last_insert_id);
@@ -345,25 +342,6 @@ class AccountsManager{
 		//returns an array of RBAC user objects
 	
 	}
-	
-	
-	//plans:
-	//consistent interface to RBAC
-	//registering users
-		//sending emails
-		//encrypting passwords (bcrypt encryption using php_hash or bcrypt library)
-		//using the ircmaxell/password-compat library too
-		//storing data
-	//updating users
-	//deleting users
-	//activating users
-	//logging in users
-		//login attempts tracking
-	//logging out users
-	//getting users
-	//managing the user session and cookies (shit, this may require Codeigniter's Session Library?)
-	//will require email handler
-	//later on include Oauth2 or HybridAuth
 	
 	public function hash_password($password, $method, $cost){
 	
