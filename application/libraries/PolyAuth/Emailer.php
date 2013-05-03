@@ -37,46 +37,25 @@ class Emailer{
 	
 	//assume $body has {{activation_code}}
 	//this can be sent multiple times, the activation code doesn't change (so the concept of resend activation email)
-	public function send_activation_email($user_id, $subject = false, $body = false, $alt_body = false){
+	public function send_activation_email($user, $subject = false, $body = false, $alt_body = false){
 	
 		$subject = (empty($subject)) ? $this->lang('email_activation_subject') : $subject;
 		$body = (empty($body)) ? $this->options['email_activation_template'] : $body;
+			
+		//use sprintf to insert activation code and user id
+		$body = sprintf(str_replace('{{user_id}}','\'%1$s\'', $body), $user->id);
+		$body = sprintf(str_replace('{{activation_code}}','\'%1$s\'', $body), $user->activationCode);
 		
-		//take the user_id, grab the person's email and activation_code
-		$query = "SELECT email, activationCode FROM {$this->options['table_users']} WHERE id = :id";
-		$sth = $this->db->prepare($query);
-		$sth->bindParam(':id', $user_id, PDO::PARAM_INT);
-		
-		try{
-			
-			$sth->execute();
-			//fetch a single row
-			$row = $sth->fetch(PDO::FETCH_OBJ);
-			
-			//use sprintf to insert activation code and user id
-			$body = sprintf(str_replace('{{user_id}}','\'%1$s\'', $body), $user_id);
-			$body = sprintf(str_replace('{{activation_code}}','\'%1$s\'', $body), $row->activationCode);
-			
-			//send email via PHPMailer
-			if(!$this->send_mail($row->email, $subject, $body, $alt_body)){
-				if($this->logger){
-					$this->logger->error('Failed to send activation email.');
-				}
-				$this->errors[] = $this->lang['activation_email_unsuccessful'];
-				return false;
-			}
-			
-			return true;
-			
-		}catch(PDOException $db_err){
-		
+		//send email via PHPMailer
+		if(!$this->send_mail($user->email, $subject, $body, $alt_body)){
 			if($this->logger){
-				$this->logger->error('Failed to execute query to fetch email and activation code given a user id.', ['exception' => $db_err]);
+				$this->logger->error('Failed to send activation email.');
 			}
 			$this->errors[] = $this->lang['activation_email_unsuccessful'];
 			return false;
-			
 		}
+		
+		return true;
 		
 	}
 	

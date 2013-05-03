@@ -13,6 +13,7 @@ class UserAccount extends Subject{
 
 	public function __construct($subject_id, RoleSet $role_set = null){
 		parent::__construct($subject_id, $role_set);
+		$this->user_data['id'] = $subject_id;
 	}
 	
 	public function get_role_set(){
@@ -36,7 +37,25 @@ class UserAccount extends Subject{
 	}
 	
 	public function get($key){
-		return $this->user_data[$key];
+		return (isset($this->user_data[$key])) ? $this->user_data[$key] : false;
+	}
+	
+	//magic getters and setters
+	//only called on inaccessible properties
+    public function __get($key) {
+		return (isset($this->user_data[$key])) ? $this->user_data[$key] : false;
+    }
+
+    public function __set($key, $value){
+		$this->user_data[$key] = $value;
+    }
+	
+	public function __isset($key){
+		return (isset($this->user_data[$key]));
+	}
+	
+	public function __unset($key){
+		unset($this->user_data[$key]);
 	}
 	
 }
