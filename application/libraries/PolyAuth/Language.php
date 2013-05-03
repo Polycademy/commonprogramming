@@ -11,7 +11,6 @@ class Language implements \ArrayAccess{
 	
 		$this->lang = array(
 			// Account Creation
-			'account_creation_successful'			=> 'Account Successfully Created',
 			'account_creation_unsuccessful'			=> 'Unable to Create Account',
 			'account_creation_duplicate_email'		=> 'Email already used or invalid',
 			'account_creation_duplicate_username'	=> 'Username already used or invalid',
@@ -19,16 +18,11 @@ class Language implements \ArrayAccess{
 			'account_creation_email_invalid'		=> 'Cannot use email activation without a emails being registered.',
 			'account_creation_assign_role'			=> 'Could not assign the role to newly created account.',
 			// Password
-			'password_change_successful'			=> 'Password Successfully Changed',
 			'password_change_unsuccessful'			=> 'Unable to Change Password',
-			'forgot_password_successful'			=> 'Password Reset Email Sent',
 			'forgot_password_unsuccessful'			=> 'Unable to Reset Password',
 			// Activation
-			'activate_successful'					=> 'Account Activated',
 			'activate_unsuccessful'					=> 'Unable to Activate Account',
-			'deactivate_successful'					=> 'Account De-Activated',
 			'deactivate_unsuccessful'				=> 'Unable to De-Activate Account',
-			'activation_email_successful'			=> 'Activation Email Sent',
 			'activation_email_unsuccessful'			=> 'Unable to Send Activation Email',
 			// Login / Logout
 			'login_successful'						=> 'Logged In Successfully',
@@ -37,16 +31,12 @@ class Language implements \ArrayAccess{
 			'login_timeout'							=> 'Temporarily Locked Out.  Try again later.',
 			'logout_successful'						=> 'Logged Out Successfully',
 			// Account Changes
-			'update_successful'						=> 'Account Information Successfully Updated',
 			'update_unsuccessful'					=> 'Unable to Update Account Information',
-			'delete_successful'						=> 'User Deleted',
 			'delete_unsuccessful'					=> 'Unable to Delete User',
+			'delete_already'						=> 'User is already Deleted.',
 			// Groups
-			'role_creation_successful'				=> 'Group created Successfully',
-			'role_already_exists'					=> 'Group name already taken',
-			'role_update_successful'				=> 'Group details updated',
-			'role_delete_successful'				=> 'Group deleted',
-			'role_delete_unsuccessful'				=> 'Unable to delete group',
+			'role_already_exists'					=> 'Role name already taken',
+			'role_delete_unsuccessful'				=> 'Unable to delete role',
 			//email
 			'email_activation_subject'				=> 'Account Activation Email',
 		);

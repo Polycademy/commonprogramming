@@ -35,29 +35,6 @@ class Emailer{
 	
 	}
 	
-	//send an email based on whether the identity or password was forgotten
-	//assume $body has {{forgotten_code}} -> this code is a OTP to login and will require a manual change in passwords
-	//setup that up in the session begin
-	//the setup for OTP is based on the user
-	//with autologin, the 
-	
-	//steps to take:
-	//click on forgot identity/password
-	//verification of user account detail (ask for username, or ask for security question) <- relies on end user to implement this
-	//use AccountManager to get details of a particular user, and check if the user has that property
-	//If verified
-	//execute forgot_password or forgot_identity
-	//forgot_password randomises the password of the user, and sends an OTP query link via send_forgotten_identity_password
-	//it also executes a database query to notify that the next time they login, they need to change their password (given that forgottenCode or forgottenTime exists and is not empty, do this on autologin and normal login)
-	//which then goes to forgot_password_complete which removes the check
-	//forgot_identity just sends that to the user's email
-	//OTP is time limited
-	public function send_forgotten_identity_password_email($user_id, $subject = false, $body = false, $alt_body = false){
-	
-		//send both the OTP + identity (based on the $body's template)
-		
-	}
-	
 	//assume $body has {{activation_code}}
 	//this can be sent multiple times, the activation code doesn't change (so the concept of resend activation email)
 	public function send_activation_email($user_id, $subject = false, $body = false, $alt_body = false){
@@ -100,6 +77,29 @@ class Emailer{
 			return false;
 			
 		}
+		
+	}
+	
+	//send an email based on whether the identity or password was forgotten
+	//assume $body has {{forgotten_code}} -> this code is a OTP to login and will require a manual change in passwords
+	//setup that up in the session begin
+	//the setup for OTP is based on the user
+	//with autologin, the 
+	
+	//steps to take:
+	//click on forgot identity/password
+	//verification of user account detail (ask for username, or ask for security question) <- relies on end user to implement this
+	//use UserAccount to get details of a particular user, and check if the user has that property
+	//If verified
+	//execute forgot_password or forgot_identity
+	//forgot_password randomises the password of the user, and sends an OTP query link via send_forgotten_identity_password
+	//it also executes a database query to notify that the next time they login, they need to change their password (given that forgottenCode or forgottenTime exists and is not empty, do this on autologin and normal login)
+	//which then goes to forgot_password_complete which removes the check
+	//forgot_identity just sends that to the user's email
+	//OTP is time limited
+	public function send_forgotten_identity_password_email($user_id, $subject = false, $body = false, $alt_body = false){
+	
+		//send both the OTP + identity (based on the $body's template)
 		
 	}
 	

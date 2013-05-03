@@ -58,10 +58,13 @@ class AccountsManager{
 		
 	}
 	
-	//let's provide some registration
-	//we'll accept some parameters, add them to the database, assign them any default roles
-	//this doesn't do validation
-	public function register($data){
+	/**
+	 * Register a new user. It adds some default data and role/permissions. It also handles the activation emails.
+	 *
+	 * @param $data array - $data parameter corresponds to user columns or properties. Make sure the identity and password and any other insertable properties are part of it.
+	 * @return $registered_user object - This is a fully loaded user object containing its roles and user data.
+	 */
+	public function register(array $data){
 		
 		//login_data should have username, password or email
 		if(empty($data[$this->options['login_identity']]) OR empty($data['password'])){
@@ -134,36 +137,47 @@ class AccountsManager{
 		
 	}
 	
-	//takes a user id and role object, and adds it to the user and saves it, the role object should have a list of permissions
-	public function register_roles(UserAccount $user, array $role_names){
+	/**
+	 * Removes a user
+	 *
+	 * @param $user_id int
+	 * @return boolean
+	 */
+	public function deregister($user_id){
+	
+		$query = "DELETE FROM {$this->options['table_users']} WHERE id = :user_id";
+		$sth = $this->db->prepare($query);
+		$sth->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 		
-		foreach($role_names as $role_name){
+		try{
 		
-			$role = $this->role_manager->roleFetchByName($role_name);
+			$sth->execute();
 			
-			if(!$this->role_manager->roleAddSubject($role, $user)){
-				$this->errors[] = $this->lang['account_creation_assign_role'];
-				return false;
+			if($sth->rowCount >= 1){
+				return true;
 			}
 			
-		}
+			$this->errors[] = $this->lang['delete_already'];
+			return false;
+			
+		}catch(PDOException $db_err){
 		
-		return $user;
+			if($this->logger){
+				$this->logger->error('Failed to execute query to delete a user.', ['exception' => $db_err]);
+			}
+			$this->errors[] = $this->lang['delete_unsuccessful'];
+			return false;
+		
+		}
 	
 	}
 	
-	protected function prepare_ip($ip_address) {
-	
-		$platform = $this->db->getAttribute(PDO::ATTR_DRIVER_NAME);
-		
-		if($platform == 'pgsql' || $platform == 'sqlsrv' || $platform == 'mssql'){
-			return $ip_address;
-		}else{
-			return inet_pton($ip_address);
-		}
-		
-	}
-	
+	/**
+	 * Checks for duplicate identity
+	 *
+	 * @param $identity string - depends on the options
+	 * @return boolean
+	 */
 	public function identity_check($identity){
 		
 		$query = "SELECT id FROM {$this->options['table_users']} WHERE {$this->options['login_identity']} = :identity";
@@ -192,13 +206,60 @@ class AccountsManager{
 	
 	}
 	
+	protected function prepare_ip($ip_address) {
+	
+		$platform = $this->db->getAttribute(PDO::ATTR_DRIVER_NAME);
+		
+		if($platform == 'pgsql' || $platform == 'sqlsrv' || $platform == 'mssql'){
+			return $ip_address;
+		}else{
+			return inet_pton($ip_address);
+		}
+		
+	}
+	
+	public function hash_password($password, $method, $cost){
+	
+		if(!$this->bcrypt_fallback){
+			$hash = password_hash($password, $method, ['cost' => $cost]);
+		}else{
+			$hash = $this->bcrypt_fallback->hash($password);
+		}
+		return $hash;
+		
+	}
+	
+	public function hash_password_verify($password, $hash){
+	
+		if(!$this->bcrypt_fallback){
+			if(password_verify($password, $hash)){
+				return true;
+			} else {
+				return false;
+			}
+		}else{
+			if($this->bcrypt_fallback->verify($password, $hash)){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+	}
+	
 	public function generate_activation_code(){
 	
 		return sha1(md5(microtime()));
 	
 	}
 	
-	//given the activation code and user id?
+	/**
+	 * Activates the new user
+	 *
+	 * @param $user_id int
+	 * @param $activation_code string - this is optional so you can manually activate a user without checking the activation code
+	 * @return boolean
+	 */
 	public function activate($user_id, $activation_code = false){
 	
 		if(!$activation_code){
@@ -265,7 +326,12 @@ class AccountsManager{
 		
 	}
 	
-	//deactivates based on a user_id
+	/**
+	 * Deactivates user
+	 *
+	 * @param $user_id int
+	 * @return boolean
+	 */
 	public function deactivate($user_id){
 	
 		//generate new activation code and return it if it was successful
@@ -293,11 +359,25 @@ class AccountsManager{
 	
 	}
 	
-	//forgot identity or password
-	public function forgotten_identity(){
+	/**
+	 * Forgotten identity, run this after you have done some identity validation such as security questions.
+	 * This sends the identity to the user's email.
+	 *
+	 * @param $user_id int
+	 * @return boolean
+	 */
+	public function forgotten_identity($user_id){
+	
+		//what is the user's email??
 	
 	}
 	
+	/**
+	 * Forgotten password
+	 *
+	 * @param $user_id int
+	 * @return boolean
+	 */
 	public function forgotten_password(){
 	
 	}
@@ -323,6 +403,12 @@ class AccountsManager{
 	
 	}
 	
+	public function get_users(){
+	
+		//return all users as RBAC objects
+	
+	}
+	
 	public function get_user(){
 	
 		//return the RBAC user object, which you can test for permissions or grab its user data or session data
@@ -343,33 +429,22 @@ class AccountsManager{
 	
 	}
 	
-	public function hash_password($password, $method, $cost){
-	
-		if(!$this->bcrypt_fallback){
-			$hash = password_hash($password, $method, ['cost' => $cost]);
-		}else{
-			$hash = $this->bcrypt_fallback->hash($password);
-		}
-		return $hash;
+	//takes a user id and role object, and adds it to the user and saves it, the role object should have a list of permissions
+	public function register_roles(UserAccount $user, array $role_names){
 		
-	}
-	
-	public function hash_password_verify($password, $hash){
-	
-		if(!$this->bcrypt_fallback){
-			if(password_verify($password, $hash)){
-				return true;
-			} else {
+		foreach($role_names as $role_name){
+		
+			$role = $this->role_manager->roleFetchByName($role_name);
+			
+			if(!$this->role_manager->roleAddSubject($role, $user)){
+				$this->errors[] = $this->lang['account_creation_assign_role'];
 				return false;
 			}
-		}else{
-			if($this->bcrypt_fallback->verify($password, $hash)){
-				return true;
-			}else{
-				return false;
-			}
+			
 		}
 		
+		return $user;
+	
 	}
 	
 	public function get_errors(){

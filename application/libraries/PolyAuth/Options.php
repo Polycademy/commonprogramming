@@ -45,7 +45,7 @@ class Options implements \ArrayAccess{
 			'email_bcc'							=> false,
 			'email_type'						=> 'html', //can be text or html
 			'email_activation_template'			=> 'Here is your activation code: {{activation_code}} and here is your user id: {{user_id}}. Here is an example link http://example.com/?activation_code={{activation_code}}&user_id={{user_id}}',
-			'email_forgotten_template'			=> 'Here is your temporary login: {{temporary_login_code}} and here is your user id: {{user_id}}. Here is an example link Here is an example link http://example.com/?temporary_login_code={{temporary_login_code}}&user_id={{user_id}}',
+			'email_forgotten_template'			=> 'Here is your temporary login: {{forgotten_code}} and here is your identity: {{identity}} and user id {{user_id}}. Here is an example link Here is an example link http://example.com/?forgotten_code={{forgotten_code}}&user_id={{user_id}}',
 			//rbac options (initial roles from the migration, also who's the default role, and root access role?)
 			'role_default'						=> 'members',
 			//login options (this is the field used to login with, plus login attempts)
