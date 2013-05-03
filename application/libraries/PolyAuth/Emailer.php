@@ -15,6 +15,8 @@ use PolyAuth\Options;
 //for languages
 use PolyAuth\Language;
 
+use PolyAuth\UserAccount;
+
 //this class handles the sending of emails
 class Emailer{
 
@@ -37,14 +39,15 @@ class Emailer{
 	
 	//assume $body has {{activation_code}}
 	//this can be sent multiple times, the activation code doesn't change (so the concept of resend activation email)
-	public function send_activation_email($user, $subject = false, $body = false, $alt_body = false){
+	public function send_activation(UserAccount $user, $subject = false, $body = false, $alt_body = false){
 	
 		$subject = (empty($subject)) ? $this->lang('email_activation_subject') : $subject;
 		$body = (empty($body)) ? $this->options['email_activation_template'] : $body;
 			
 		//use sprintf to insert activation code and user id
-		$body = sprintf(str_replace('{{user_id}}','\'%1$s\'', $body), $user->id);
-		$body = sprintf(str_replace('{{activation_code}}','\'%1$s\'', $body), $user->activationCode);
+		$body = str_replace('{{user_id}}','%1$s', $body);
+		$body = str_replace('{{activation_code}}','%2$s', $body);
+		$body = sprintf($body, $user->id, $user->activationCode);
 		
 		//send email via PHPMailer
 		if(!$this->send_mail($user->email, $subject, $body, $alt_body)){
@@ -59,27 +62,47 @@ class Emailer{
 		
 	}
 	
-	//send an email based on whether the identity or password was forgotten
-	//assume $body has {{forgotten_code}} -> this code is a OTP to login and will require a manual change in passwords
-	//setup that up in the session begin
-	//the setup for OTP is based on the user
-	//with autologin, the 
+	public function send_forgotten_identity(UserAccount $user, $subject = false, $body = false, $alt_body = false){
 	
-	//steps to take:
-	//click on forgot identity/password
-	//verification of user account detail (ask for username, or ask for security question) <- relies on end user to implement this
-	//use UserAccount to get details of a particular user, and check if the user has that property
-	//If verified
-	//execute forgot_password or forgot_identity
-	//forgot_password randomises the password of the user, and sends an OTP query link via send_forgotten_identity_password
-	//it also executes a database query to notify that the next time they login, they need to change their password (given that forgottenCode or forgottenTime exists and is not empty, do this on autologin and normal login)
-	//which then goes to forgot_password_complete which removes the check
-	//forgot_identity just sends that to the user's email
-	//OTP is time limited
-	public function send_forgotten_identity_password_email($user_id, $subject = false, $body = false, $alt_body = false){
-	
-		//send both the OTP + identity (based on the $body's template)
+		$subject = (empty($subject)) ? $this->lang('email_forgotten_identity_subject') : $subject;
+		$body = (empty($body)) ? $this->options['email_forgotten_identity_template'] : $body;
 		
+		$body = str_replace('{{user_id}}','%1$s', $body);
+		$body = str_replace('{{identity}}','%2$s', $body);
+		$body = sprintf($body, $user->id, $user->{$this->options['identity']});
+		
+		if(!$this->send_mail($user->email, $subject, $body, $alt_body)){
+			if($this->logger){
+				$this->logger->error('Failed to send forgotten identity email.');
+			}
+			$this->errors[] = $this->lang['forgotten_identity_email_unsuccessful'];
+			return false;
+		}
+		
+		return true;
+		
+	}
+	
+	public function send_forgotten_password(){
+	
+		$subject = (empty($subject)) ? $this->lang('email_forgotten_password_subject') : $subject;
+		$body = (empty($body)) ? $this->options['email_forgotten_password_template'] : $body;
+	
+		$body = str_replace('{{user_id}}','%1$s', $body);
+		$body = str_replace('{{identity}}','%2$s', $body);
+		$body = str_replace('{{forgotten_code}}','%3$s', $body);
+		$body = sprintf($body, $user->id, $user->{$this->options['identity']}, $user->forgottenCode);
+		
+		if(!$this->send_mail($user->email, $subject, $body, $alt_body)){
+			if($this->logger){
+				$this->logger->error('Failed to send forgotten password email.');
+			}
+			$this->errors[] = $this->lang['forgotten_password_email_unsuccessful'];
+			return false;
+		}
+		
+		return true;
+	
 	}
 	
 	public function send_mail($email_to, $subject, $body, $alt_body = false){

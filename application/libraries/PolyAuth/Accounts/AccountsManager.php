@@ -16,7 +16,7 @@ use PolyAuth\Options;
 use PolyAuth\Language;
 
 //for security
-use PolyAuth\BcryptFallback;
+use PolyAuth\Accounts\BcryptFallback;
 
 //for registration
 use PolyAuth\Emailer;
@@ -95,7 +95,7 @@ class AccountsManager{
 		
 		//inserting activation code into the users table, if the reg_activation is by email
 		if($this->options['reg_activation'] == 'email'){
-			$data['activationCode'] = $this->generate_activation_code(); 
+			$data['activationCode'] = $this->generate_code(); 
 		}
 		
 		$column_string = implode(',', array_keys($data));
@@ -130,7 +130,7 @@ class AccountsManager{
 		
 		//automatically send the activation email
 		if($this->options['reg_activation'] == 'email' AND $this->options['email'] AND $registered_user->email){
-			$this->emailer->send_activation_email($registered_user);
+			$this->emailer->send_activation($registered_user);
 		}
 		
 		return $registered_user;
@@ -247,7 +247,7 @@ class AccountsManager{
 		
 	}
 	
-	public function generate_activation_code(){
+	public function generate_code(){
 	
 		return sha1(md5(microtime()));
 	
@@ -340,7 +340,7 @@ class AccountsManager{
 	public function deactivate(UserAccount $user){
 	
 		//generate new activation code and return it if it was successful
-		$activation_code = generate_activation_code();
+		$activation_code = generate_code();
 		$query = "UPDATE {$this->options['table_users']} SET active = 0, activationCode = :activation_code WHERE id = :id";
 		$sth = $this->db->prepare($query);
 		$sth->bindParam(':activation_code', $activation_code, PDO::PARAM_STR);
@@ -368,36 +368,72 @@ class AccountsManager{
 	 * Forgotten identity, run this after you have done some identity validation such as security questions.
 	 * This sends the identity to the user's email.
 	 *
-	 * @param $user_id int
+	 * @param $user object
 	 * @return boolean
 	 */
 	public function forgotten_identity(UserAccount $user){
 	
-		//what is the user's email??
-		//$this
+		return $this->emailer->send_forgotten_identity($user);
 	
 	}
 	
 	/**
-	 * Forgotten password
+	 * Forgotten password, run this after you have done some identity validation such as security questions.
+	 * Generates a forgotten code and forgotten time
 	 *
-	 * @param $user_id int
+	 * @param $user object
 	 * @return boolean
 	 */
-	public function forgotten_password(){
+	public function forgotten_password(UserAccount $user){
+	
+		$user->forgottenCode = $this->generate_code();
+		$user->forgottenDate = date('Y-m-d H:i:s');
+		
+		$query = "UPDATE {$this->options['table_users']} SET forgottenCode = :forgotten_code, forgottenDate = :forgotten_date WHERE id = :user_id";
+		$sth = $this->db->prepare($query);
+		$sth->bindParam('forgotten_code', $user->forgottenCode PDO::PARAM_STR);
+		$sth->bindParam('forgotten_date', $user->forgottenDate, PDO::PARAM_STR);
+		$sth->bindParam('user_id', $user->id, PDO::PARAM_INT);
+		
+		try{
+		
+			$sth->execute();
+			if($sth->rowCount < 1){
+				//no one was updated
+				$this->errors[] = $this->lang['forgot_unsuccessful'];
+				return false;
+			}
+			
+			//continue to send email
+			return $this->emailer->send_forgot_password($user);
+		
+		}catch(PDOException $db_err){
+		
+			if($this->logger){
+				$this->logger->error("Failed to execute query to update user with forgotten code and date", ['exception' => $db_err]);
+			}
+			$this->errors[] = $this->lang['deactivate_unsuccessful'];
+			return false;
+		
+		}
 	
 	}
 	
 	//checks if the OTP is correct and within the time limit
-	public function forgotten_check(){
+	//make sure to see if time limit is 0, otherwise, the time limit is forever!
+	public function forgotten_check(UserAccount $user, $activation_code){
 	
 	}
 	
-	public function forgotten_complete(){
+	//if the forgotten check goes through. Updates with a new password and clear the forgotten
+	public function forgotten_complete(UserAccount $user, $new_password){
+	
+		//hashing and whateva
 	
 	}
 	
-	public function clear_forgotten(){
+	//on finish of forgotten complete or when the forgotten time has exceeded its time limit
+	public function clear_forgotten(UserAccount $user){
 	
 	}
 	

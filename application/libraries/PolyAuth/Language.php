@@ -20,6 +20,7 @@ class Language implements \ArrayAccess{
 			// Password
 			'password_change_unsuccessful'			=> 'Unable to Change Password',
 			'forgot_password_unsuccessful'			=> 'Unable to Reset Password',
+			'forgot_unsuccessful'					=> 'Unable to update forgotten code and dates.',
 			// Activation
 			'activate_unsuccessful'					=> 'Unable to Activate Account',
 			'deactivate_unsuccessful'				=> 'Unable to De-Activate Account',
@@ -38,7 +39,9 @@ class Language implements \ArrayAccess{
 			'role_already_exists'					=> 'Role name already taken',
 			'role_delete_unsuccessful'				=> 'Unable to delete role',
 			//email
-			'email_activation_subject'				=> 'Account Activation Email',
+			'email_activation_subject'				=> 'Account Activation PolyAuth',
+			'email_forgotten_identity_subject'		=> 'Forgotten Identity PolyAuth',
+			'email_forgotten_password_subject'		=> 'Forgotten Password PolyAuth',
 		);
 	
 	}

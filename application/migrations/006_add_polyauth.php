@@ -29,7 +29,8 @@ class Migration_add_polyauth extends CI_Migration {
 			'password'				=> '$2y$10$EiqipvSt3lnD//nchj4u9OgOTL9R3J4AbZ5bUVVrh.Tq/gmc5xIvS',
 			'email'					=> 'admin@admin.com',
 			'activationCode'		=> '',
-			'forgottenPasswordCode'	=> NULL,
+			'forgottenCode'			=> NULL,
+			'forgottenDate'			=> NULL,
 			'createdOn'				=> date('Y-m-d H:i:s'),
 			'lastLogin'				=> date('Y-m-d H:i:s'),
 			'active'				=> '1',
@@ -96,10 +97,8 @@ class Migration_add_polyauth extends CI_Migration {
 				'constraint' => '40',
 				'null' => TRUE
 			),
-			'forgottenTime' => array(
-				'type' => 'INT',
-				'constraint' => '11',
-				'unsigned' => TRUE,
+			'forgottenDate' => array(
+				'type' => 'DATETIME',
 				'null' => TRUE
 			),
 			'rememberCode' => array(
