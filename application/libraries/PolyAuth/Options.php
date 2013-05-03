@@ -44,20 +44,29 @@ class Options implements \ArrayAccess{
 			'email_cc'							=> false,
 			'email_bcc'							=> false,
 			'email_type'						=> 'html', //can be text or html
-			'email_activation_template'			=> 'Here is your activation code: {{activation_code}} and here is your user id: {{user_id}}. Here is an example link http://example.com/?activation_code={{activation_code}}&user_id={{user_id}}',
-			'email_forgotten_template'			=> 'Here is your temporary login: {{forgotten_code}} and here is your identity: {{identity}} and user id {{user_id}}. Here is an example link Here is an example link http://example.com/?forgotten_code={{forgotten_code}}&user_id={{user_id}}',
+			'email_activation_template'			=> 'Activation code: {{activation_code}} User id: {{user_id}}. Here is an example link http://example.com/?activation_code={{activation_code}}&user_id={{user_id}}',
+			'email_forgotten_identity_template'	=> 'Identity: {{identity}} User id {{user_id}}.',
+			'email_forgotten_password_template'	=> 'Temporary login: {{forgotten_code}} Identity: {{identity}} User id {{user_id}}.',
 			//rbac options (initial roles from the migration, also who's the default role, and root access role?)
 			'role_default'						=> 'members',
 			//login options (this is the field used to login with, plus login attempts)
 			'login_identity'					=> 'username', //can be email or username
-			'login_password_minlength'			=> 8,
-			'login_password_maxlength'			=> 20,
+			'login_password_complexity'			=> array(
+				'min'		=> 8,
+				'max'		=> 32,
+				'lower'		=> false,
+				'upper'		=> false,
+				'number'	=> false,
+				'special'	=> false,
+				'identity'	=> false, //different from identity?
+				'unique'	=> false,
+			), //can be an array or false or empty array
 			'login_persistent'					=> true, //allowing remember me or not
 			'login_expiration'					=> 86500, // How long to remember the user (seconds). Set to zero for no expiration
 			'login_expiration_extend'			=> true, //allowing whether autologin extends the login_expiration
 			'login_attempts'					=> 0, //if 0, then it is disabled
 			'login_lockout'						=> 0, //lockout time in seconds
-			'login_forgot_password_expiration'	=> 0, //how long before the temporary password expires
+			'login_forgot_expiration'			=> 0, //how long before the temporary password expires
 			//registration options
 			'reg_activation'					=> false, //can be email, manual, or false
 		);
