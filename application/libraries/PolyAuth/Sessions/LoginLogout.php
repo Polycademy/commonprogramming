@@ -15,9 +15,6 @@ use PolyAuth\Options;
 //for languages
 use PolyAuth\Language;
 
-//for security
-use PolyAuth\BcryptFallback;
-
 //for sessions
 use PolyAuth\Sessions\CookieManager;
 use Aura\Session\Manager as SessionManager;
@@ -25,6 +22,7 @@ use Aura\Session\SegmentFactory;
 use Aura\Session\CsrfTokenFactory;
 
 //for RBAC (to authenticate against access)
+use PolyAuth\Accounts\AccountsManager;
 use PolyAuth\UserAccount;
 use RBAC\Permission;
 use RBAC\Role\Role;
@@ -38,8 +36,8 @@ class LoginLogout{
 	protected $lang;
 	protected $logger;
 	protected $session_manager;
+	protected $accounts_manager;
 	protected $role_manager;
-	protected $bcrypt_fallback = false;
 	
 	protected $user; //this is used to represent the user account for the RBAC, it is only initialised when a person logs in, it is not be used for any other purposes, always must represent the currently logged in user
 	
@@ -60,12 +58,8 @@ class LoginLogout{
 			$this->options['cookie_httponly']
 		);
 		$this->session_manager = new SessionManager(new SegmentFactory, new CsrfTokenFactory);
+		$this->accounts_manager = new AccountsManager($db, $options, $logger); //to mainly use the password hash verify
 		$this->role_manager  = new RoleManager($db, $logger);
-		
-		//if you use bcrypt fallback, you must always use bcrypt fallback, you cannot switch servers!
-		if($this->options['hash_fallback']){
-			$this->bcrypt_fallback = new BcryptFallback($this->options['hash_rounds']);
-		}
 		
 		$this->startyourengines();
 	
