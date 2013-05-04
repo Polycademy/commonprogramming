@@ -27,6 +27,7 @@ class Migration_add_polyauth extends CI_Migration {
 			'ipAddress'				=> inet_pton('127.0.0.1'),
 			'username'				=> 'administrator',
 			'password'				=> '$2y$10$EiqipvSt3lnD//nchj4u9OgOTL9R3J4AbZ5bUVVrh.Tq/gmc5xIvS',
+			'passwordChange'		=> '0',
 			'email'					=> 'admin@admin.com',
 			'activationCode'		=> '',
 			'forgottenCode'			=> NULL,
@@ -82,6 +83,12 @@ class Migration_add_polyauth extends CI_Migration {
 			'password' => array(
 				'type' => 'VARCHAR',
 				'constraint' => '255',
+			),
+			'passwordChange' => array(
+				'type' => 'TINYINT',
+				'constraint' => '1',
+				'unsigned' => TRUE,
+				'null' => TRUE,
 			),
 			'email' => array(
 				'type' => 'VARCHAR',

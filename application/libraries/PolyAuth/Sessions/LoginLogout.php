@@ -65,6 +65,7 @@ class LoginLogout{
 	
 	}
 	
+	//remember to ask to change passwords if it detects a forgottenCode and forgottenTime and call the necessary method in accounts manager
 	protected function startyourengines(){
 	
 		//immediately logs the person in if they have identity, rememberCode and are not currently logged in

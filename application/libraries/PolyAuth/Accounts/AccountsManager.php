@@ -66,6 +66,7 @@ class AccountsManager{
 	
 	/**
 	 * Register a new user. It adds some default data and role/permissions. It also handles the activation emails.
+	 * Validation of the $data array is the end user's responsibility. We don't know what custom data fields the end user may want.
 	 *
 	 * @param $data array - $data parameter corresponds to user columns or properties. Make sure the identity and password and any other insertable properties are part of it.
 	 * @return $registered_user object - This is a fully loaded user object containing its roles and user data.
@@ -392,7 +393,7 @@ class AccountsManager{
 		$user->forgottenCode = $this->random->generate(40);
 		$user->forgottenDate = date('Y-m-d H:i:s');
 		
-		$query = "UPDATE {$this->options['table_users']} SET forgottenCode = :forgotten_code, forgottenDate = :forgotten_date WHERE id = :user_id";
+		$query = "UPDATE {$this->options['table_users']} SET passwordChange = 1, forgottenCode = :forgotten_code, forgottenDate = :forgotten_date WHERE id = :user_id";
 		$sth = $this->db->prepare($query);
 		$sth->bindParam('forgotten_code', $user->forgottenCode PDO::PARAM_STR);
 		$sth->bindParam('forgotten_date', $user->forgottenDate, PDO::PARAM_STR);
@@ -492,7 +493,7 @@ class AccountsManager{
 	 */
 	public function forgotten_clear(UserAccount $user){
 	
-		$query = "UPDATE {$this->options['table_users']} SET forgottenCode = NULL, forgottenTime = NULL WHERE id = :user_id";
+		$query = "UPDATE {$this->options['table_users']} SET passwordChange = 0, forgottenCode = NULL, forgottenTime = NULL WHERE id = :user_id";
 		$sth = $this->db->prepare($query);
 		$sth->bindParam('user_id', $user->id, PDO::PARAM_INT);
 		
@@ -525,6 +526,7 @@ class AccountsManager{
 	/**
 	 * Changes the password of the user. If the old password was provided, it will be checked against the user, otherwise the password change will be forced.
 	 * Also passes the password through the complexity checks.
+	 * Also sets turns off the password change flag
 	 *
 	 * @param $user object
 	 * @param $new_password string
@@ -564,7 +566,7 @@ class AccountsManager{
 		$new_password = $this->hash_password($new_password, $this->options['hash_method'], $this->options['hash_rounds']);
 		
 		//update with new password
-		$query = "UPDATE {$this->options['table_users']} SET password = :new_password WHERE id = :user_id";
+		$query = "UPDATE {$this->options['table_users']} SET password = :new_password, passwordChange = 0 WHERE id = :user_id";
 		$sth = $this->db->prepare($query);
 		$sth->bindParam('new_password', $new_password, PDO::PARAM_STR);
 		$sth->bindParam('user_id', $user->id, PDO::PARAM_INT);
@@ -598,7 +600,7 @@ class AccountsManager{
 	 * @param $user object
 	 * @return boolean
 	 */
-	public function reset_password($user){
+	public function reset_password(UserAccount $user){
 	
 		//find the max of the min or max
 		$min = (!empty($this->options['login_password_complexity']['min'])) ? $this->options['login_password_complexity']['min'] : 0;
@@ -606,33 +608,57 @@ class AccountsManager{
 		
 		$length = max($min, $max);
 		$new_password = $this->random->generate($length, true);
-		$new_hashed_password = $this->hash_password($new_password, $this->options['hash_method'], $this->options['hash_rounds']);
 		
-		//update
-		$query = "UPDATE {$this->options['table_users']} SET password = :new_password WHERE id = :user_id";
+		if(!$this->change_password($user, $new_password)){
+			return false;
+		}
+		
+		return $new_password;
+	
+	}
+	
+	/**
+	 * Switches on the password change flag, forcing the user to change their passwords upon their next login
+	 *
+	 * @param $users array of objects
+	 * @return boolean
+	 */
+	public function force_password_change(array $users){
+	
+		foreach($users as $user){
+		
+			if($user instanceof UserAccount){
+			
+				$in_sql[] = $user->id;
+			
+			}else{
+			
+				return false;
+			
+			}
+		
+		}
+		
+		$in_sql = implode(',', $in_sql);
+		
+		$query = "UPDATE {$this->options['table_users']} SET passwordChange = 1 WHERE id IN ($in_sql)";
 		$sth = $this->db->prepare($query);
-		$sth->bindParam('new_password', $new_hashed_password, PDO::PARAM_STR);
-		$sth->bindParam('user_id', $user->id, PDO::PARAM_INT);
 		
 		try{
 		
 			$sth->execute();
-			if($sth->rowCount < 1){
-				$this->errors[] = $this->lang['password_change_unsuccessful'];
-				return false;
-			}
+			//if they were already flagged, then the job has been done
+			return true;
 		
 		}catch(PDOException $db_err){
 		
 			if($this->logger){
-				$this->logger->error("Failed to execute query to reset and update the password hash with user {$user->id}.", ['exception' => $db_err]);
+				$this->logger->error("Failed to execute query to flag the password for change.", ['exception' => $db_err]);
 			}
-			$this->errors[] = $this->lang['password_change_unsuccessful'];
+			$this->errors[] = $this->lang['password_flag'];
 			return false;
 		
 		}
-		
-		return $new_password;
 	
 	}
 	

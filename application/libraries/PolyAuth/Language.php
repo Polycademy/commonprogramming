@@ -28,6 +28,7 @@ class Language implements \ArrayAccess{
 			'password_diffpass'						=> 'Password must be a bit more different than the last password.',
 			'password_diffidentity'					=> 'Password should not contain your identity.',
 			'password_unique'						=> 'Password must contain more unique characters.',
+			'password_flag'							=> 'Was unable to flag the password for change on the next login.',
 			'forgot_password_unsuccessful'			=> 'Unable to Reset Password',
 			'forgot_unsuccessful'					=> 'Unable to update forgotten code and dates.',
 			'forgot_check_unsuccessful'				=> 'The forgotten code is invalid or forgotten time limit has been exceeded.',
