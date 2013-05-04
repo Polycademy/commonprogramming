@@ -14,39 +14,41 @@ class PasswordComplexity{
 	
 	protected $options;
 	protected $lang;
+	protected $r;
 	
-	protected $min;
-	protected $max;
+	protected $min = 0;
+	protected $max = 32;
 	protected $diffpass = 3;
 	protected $unique = 4;
-	protected $complexity_level = 0;
+	protected $complexity_level;
 	
-	protected $issues = array();
+	protected $errors = array();
 	
 	public function __construct(Options $options, Language $language){
 	
 		$this->options = $options;
 		$this->lang = $language;
+		$this->r = new \ReflectionClass($this);
 		$this->set_complexity($this->options['login_password_complexity']);
 	
 	}
 	
 	public function set_complexity(array $complexity_options){
 	
-		$this->min = (!empty($complexity_options['min']) $complexity_options['min'] : 0;
-		$this->max = (!empty($complexity_options['max']) $complexity_options['max'] : 0;
+		$this->min = (!empty($complexity_options['min']) ? $complexity_options['min'] : $this->min;
+		$this->max = (!empty($complexity_options['max']) ? $complexity_options['max'] : $this->max;
+		$this->diffpass = (!empty($complexity_options['diffpass']) ? $complexity_options['diffpass'] : $this->diffpass;
+		$this->unique = (!empty($complexity_options['unique'])) ? $complexity_options['unique'] : $this->unique;
 		
 		//if it is false, then no complexity settings
 		if(!empty($complexity_options)){
 		
-			$complexity_level = 0;
+			$complexity_level = 0;			
 			
-			$r = new ReflectionClass($this);
-			
-			foreach($r->getConstants() as $name => $constant){
+			foreach($this->r->getConstants() as $name => $constant){
 			
 				//REQUIRE_MIN => min
-				$name = explode('_', $name, 2);
+				$name = explode('_', strtolower($name), 2);
 				//check if the option is set and it is not strictly equal to false
 				if(isset($complexity_options[$name] AND $complexity_options[$name] !== false){
 					//add to the complexity level
@@ -54,9 +56,6 @@ class PasswordComplexity{
 				}
 			
 			}
-			
-			//this will be set by default, because the "optionality" will be determined by whether old_pass was passed in
-			$complexity_level += self::REQUIRE_DIFFPASS;
 			
 			$this->complexity_level = $complexity_level;
 			
@@ -69,103 +68,126 @@ class PasswordComplexity{
 		
 	}
 	
-	//checks complexity of password
-	//old pass and username is optional.
-	//if the options didn't specify it, they won't be checked anyway
 	public function complex_enough($new_pass, $old_pass = false, $username = false){
 	
 		$enough = TRUE;
 		
-		$r = new ReflectionClass($this);
+		//if the complexity level is left at 0, just return true since it's complex enough!
+		if($this->complexity_level !== 0){
 		
-		foreach($r->getConstants() as $name => $constant){
-		
-			//bitwise operator, looks for a matching bit for each constant and the complexity level
-			if($this->complexity_level & $constant){
+			foreach($this->r->getConstants() as $name => $constant){
 			
-				/** REQUIRE_MIN becomes _requireMin() **/
-				$parts = explode('_', $name, 2);
-				$funcName = "_{$parts[0]}" . ucwords($parts[1]);
-				$result = call_user_func_array(array($this, $funcName), array($newPass, $oldPass, $username));
-				if ($result !== TRUE) {
-					$enough = FALSE;
-					$this->issues[] = $result;
+				//bitwise operator, looks for a matching bit for each constant and the complexity level
+				if($this->complexity_level & $constant){
+				
+					//apparently case does not matter here
+					$result = call_user_func_array(array($this, $name), array($new_pass, $old_pass, $username));
+					
+					if($result !== TRUE){
+						$enough = FALSE;
+						$this->errors[] = $result;
+					}
+					
 				}
 				
 			}
-			
+		
 		}
 		
 		return $enough;
 		
 	}
 	
-	public function getPasswordIssues(){
-		return $this->_issues;
+	public function get_errors(){
+		return $this->errors;
 	}
 	
-	protected function _requireMin($newPass)
-	{
-		if (strlen($newPass) < $this->_passwordMinLength) {
-			return 'Password is not long enough.';
+	protected function require_min($new_pass){
+	
+		if (strlen($new_pass) < $this->min) {
+			return $this->lang['password_min'];
 		}
 		return true;
+		
 	}
-	protected function _requireMax($newPass)
-	{
-		if (strlen($newPass) > $this->_passwordMaxLength) {
-			return 'Password is too long.';
+	
+	protected function require_max($new_pass){
+	
+		if (strlen($new_pass) > $this->max) {
+			return $this->lang['password_max'];
 		}
 		return true;
+		
 	}
-	protected function _requireLowercase($newPass)
-	{
-		if (!preg_match('/[a-z]/', $newPass)) {
-			return 'Password requires a lowercase letter.';
+	
+	protected function require_lowercase($new_pass){
+	
+		if (!preg_match('/[a-z]/', $new_pass)) {
+			return $this->lang['password_lowercase'];
 		}
 		return true;
+	
 	}
-	protected function _requireUppercase($newPass)
-	{
-		if (!preg_match('/[A-Z]/', $newPass)) {
-			return 'Password requires an uppercase letter.';
+	
+	protected function require_uppercase($new_pass){
+	
+		if (!preg_match('/[A-Z]/', $new_pass)) {
+			return $this->lang['password_uppercase'];
 		}
 		return true;
+		
 	}
-	protected function _requireNumber($newPass)
-	{
-		if (!preg_match('/[0-9]/', $newPass)) {
-			return 'Password requires a number.';
+	
+	protected function require_number($new_pass){
+	
+		if (!preg_match('/[0-9]/', $new_pass)) {
+			return $this->lang['password_number'];
 		}
 		return true;
+		
 	}
-	protected function _requireSpecialChar($newPass)
-	{
-		if (!preg_match('/[^a-zA-Z0-9]/', $newPass)) {
-			return 'Password requires a special character.';
+	
+	protected function require_specialchar($new_pass){
+	
+		if (!preg_match('/[^a-zA-Z0-9]/', $new_pass)) {
+			return $this->lang['password_specialchar'];
 		}
 		return true;
+		
 	}
-	protected function _requireDiffpass($newPass, $oldPass)
-	{
-		if (strlen($newPass) - similar_text($oldPass,$newPass) < $this->_passwordDiffLevel || stripos($newPass, $oldPass) !== FALSE) {
-			return 'Password must be a bit more different than the last password.';
+	
+	protected function require_diffpass($new_pass, $old_pass){
+	
+		//if the old_pass was false, then the check is optional
+		if($old_pass){
+			if (strlen($new_pass) - similar_text($old_pass, $new_pass) < $this->diffpass || stripos($new_pass, $old_pass) !== FALSE) {
+				return $this->lang['password_diffpass'];
+			}
 		}
 		return true;
+		
 	}
-	protected function _requireDiffuser($newPass, $oldPass, $username)
-	{
-		if (stripos($newPass, $username) !== FALSE) {
-			return 'Password should not contain your username.';
+	
+	protected function require_diffuser($new_pass, $old_pass, $username){
+	
+		//if the username was false, then the check is optional
+		if($username){
+			if (stripos($new_pass, $username) !== FALSE) {
+				return $this->lang['password_diffuser'];
+			}
 		}
 		return true;
+		
 	}
-	protected function _requireUnique($newPass)
-	{
-		$uniques = array_unique(str_split($newPass));
-		if (count($uniques) < $this->_uniqueChrRequired) {
-			return 'Password must contain more unique characters.';
+	
+	protected function require_unique($new_pass){
+	
+		$uniques = array_unique(str_split($new_pass));
+		if (count($uniques) < $this->unique) {
+			return $this->lang['password_unique'];
 		}
 		return true;
+		
 	}
+	
 }
