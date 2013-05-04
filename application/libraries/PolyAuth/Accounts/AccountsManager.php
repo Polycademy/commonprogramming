@@ -566,6 +566,41 @@ class AccountsManager{
 	
 	}
 	
+	//takes two arrays
+	//first array is the array of roles to descriptions
+	//second array is an array of roles to array of permission to permission description
+	//matches them up (discards non matches anomalies)
+	//creates the permissions, assigns them to the roles, saves them
+	public function register_roles_permissions(){
+	
+		//if a role doesn't exist, create it
+		//if a role does exist, update it (this means updating the list of permissions, not necessarily adding to it)
+		//example:
+		
+		//role: admin - admin_desc
+		//permission: admin_view - desc
+		//permission: admin_edit - desc
+		
+		//if role doesn't exist, create it
+		//if admin does exist
+		//and the passed in update is
+		//role: admin - different_desc
+		//permission: admin_edit - new_desc
+		//then the role will be updated to only contain that permission and the other associated updates
+	
+	}
+	
+	//same kind of thing, specify roles to delete
+	//or specify roles to permissions to delete
+	public function delete_roles_permissions(array $roles_permissions){
+	
+		//expects array: ('role' => array('perm', 'perm');)
+		//OR array: ('role1', 'role2')
+		//OR array: ('role1', 'role2' => array('perm'));
+		//it either deletes a role completely OR deletes a permission as part of a role, but keeps the role
+	
+	}
+	
 	//takes a user id and role object, and adds it to the user and saves it, the role object should have a list of permissions
 	public function register_roles(UserAccount $user, array $role_names){
 		
