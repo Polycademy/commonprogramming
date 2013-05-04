@@ -55,6 +55,9 @@ class PasswordComplexity{
 			
 			}
 			
+			//this will be set by default, because the "optionality" will be determined by whether old_pass was passed in
+			$complexity_level += self::REQUIRE_DIFFPASS;
+			
 			$this->complexity_level = $complexity_level;
 			
 		}else{
@@ -66,33 +69,41 @@ class PasswordComplexity{
 		
 	}
 	
-	/**
-	 * checks for complexity level. If returns false, it has populated the _issues array
-	 */
-	public function complexEnough($newPass, $oldPass, $username){
+	//checks complexity of password
+	//old pass and username is optional.
+	//if the options didn't specify it, they won't be checked anyway
+	public function complex_enough($new_pass, $old_pass = false, $username = false){
 	
 		$enough = TRUE;
+		
 		$r = new ReflectionClass($this);
-		foreach ($r->getConstants() as $name => $constant) {
-			/** means we have to check that type then **/
-			if ($this->complexityLevel & $constant) {
+		
+		foreach($r->getConstants() as $name => $constant){
+		
+			//bitwise operator, looks for a matching bit for each constant and the complexity level
+			if($this->complexity_level & $constant){
+			
 				/** REQUIRE_MIN becomes _requireMin() **/
 				$parts = explode('_', $name, 2);
 				$funcName = "_{$parts[0]}" . ucwords($parts[1]);
 				$result = call_user_func_array(array($this, $funcName), array($newPass, $oldPass, $username));
 				if ($result !== TRUE) {
 					$enough = FALSE;
-					$this->_issues[] = $result;
+					$this->issues[] = $result;
 				}
+				
 			}
+			
 		}
+		
 		return $enough;
 		
 	}
-	public function getPasswordIssues()
-	{
+	
+	public function getPasswordIssues(){
 		return $this->_issues;
 	}
+	
 	protected function _requireMin($newPass)
 	{
 		if (strlen($newPass) < $this->_passwordMinLength) {
