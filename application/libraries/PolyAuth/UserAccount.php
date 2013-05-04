@@ -16,8 +16,18 @@ class UserAccount extends Subject{
 		$this->user_data['id'] = $subject_id;
 	}
 	
+	//this is an object!
 	public function get_role_set(){
 		return $this->getRoleSet();
+	}
+	
+	public function get_roles(){
+		return $this->getRoleset()->getRoles();
+	}
+	
+	public function has_role($role){
+		$roles = $this->getRoleset()->getRoles();
+		return isset($roles[$role]);
 	}
 	
 	public function has_permission($permission){
