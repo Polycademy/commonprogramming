@@ -18,6 +18,7 @@ use PolyAuth\Language;
 //for security
 use PolyAuth\Accounts\BcryptFallback;
 use PolyAuth\Accounts\PasswordComplexity;
+use PolyAuth\Accounts\Random;
 
 //for RBAC (to CRUD roles and permissions)
 use PolyAuth\UserAccount;
@@ -35,6 +36,7 @@ class AccountsManager{
 	protected $lang;
 	protected $logger;
 	protected $password_manager;
+	protected $random;
 	protected $role_manager;
 	protected $emailer;
 	protected $bcrypt_fallback = false;
@@ -51,6 +53,7 @@ class AccountsManager{
 		$this->db = $db;
 		$this->logger = $logger;
 		$this->password_manager = new PasswordComplexity($options, $language);
+		$this->random = new Random;
 		$this->role_manager  = new RoleManager($db, $logger);
 		$this->emailer = new Emailer($db, $options, $language, $logger);
 		
@@ -104,7 +107,7 @@ class AccountsManager{
 		
 		//inserting activation code into the users table, if the reg_activation is by email
 		if($this->options['reg_activation'] == 'email'){
-			$data['activationCode'] = $this->generate_code(); 
+			$data['activationCode'] = $this->random->generate(40); 
 		}
 		
 		$column_string = implode(',', array_keys($data));
@@ -256,12 +259,6 @@ class AccountsManager{
 		
 	}
 	
-	public function generate_code(){
-	
-		return sha1(md5(microtime()));
-	
-	}
-	
 	/**
 	 * Either resends the activation email, or it can be used to manually begin sending the activation email.
 	 * It regenerates the activation code as well.
@@ -344,7 +341,7 @@ class AccountsManager{
 	public function deactivate(UserAccount $user){
 	
 		//generate new activation code and return it if it was successful
-		$activation_code = generate_code();
+		$activation_code = $this->random->generate(40);
 		$query = "UPDATE {$this->options['table_users']} SET active = 0, activationCode = :activation_code WHERE id = :id";
 		$sth = $this->db->prepare($query);
 		$sth->bindParam(':activation_code', $activation_code, PDO::PARAM_STR);
@@ -392,7 +389,7 @@ class AccountsManager{
 	 */
 	public function forgotten_password(UserAccount $user){
 	
-		$user->forgottenCode = $this->generate_code();
+		$user->forgottenCode = $this->random->generate(40);
 		$user->forgottenDate = date('Y-m-d H:i:s');
 		
 		$query = "UPDATE {$this->options['table_users']} SET forgottenCode = :forgotten_code, forgottenDate = :forgotten_date WHERE id = :user_id";
@@ -534,7 +531,7 @@ class AccountsManager{
 	 * @param $old_password string optional
 	 * @return boolean
 	 */
-	public function change_password($user, $new_password, $old_password = false){
+	public function change_password(UserAccount $user, $new_password, $old_password = false){
 	
 		//if old password exists, we need to check if it matches the database record
 		if($old_password){
@@ -564,12 +561,12 @@ class AccountsManager{
 		}
 		
 		//hash new password
-		$password = $this->hash_password(password, $this->options['hash_method'], $this->options['hash_rounds']);
+		$new_password = $this->hash_password($new_password, $this->options['hash_method'], $this->options['hash_rounds']);
 		
 		//update with new password
 		$query = "UPDATE {$this->options['table_users']} SET password = :new_password WHERE id = :user_id";
 		$sth = $this->db->prepare($query);
-		$sth->bindParam('new_password', $password, PDO::PARAM_STR);
+		$sth->bindParam('new_password', $new_password, PDO::PARAM_STR);
 		$sth->bindParam('user_id', $user->id, PDO::PARAM_INT);
 		
 		try{
@@ -594,13 +591,48 @@ class AccountsManager{
 	
 	}
 	
-	//not used in this library, but this will randomise the password and return the actual password (not the hash)
+	/**
+	 * Resets the password for $user to a random password. Will return the password.
+	 * This does not pass the password complexity tests, but will be sufficiently random!
+	 *
+	 * @param $user object
+	 * @return boolean
+	 */
 	public function reset_password($user){
 	
-		//randomise the password
-		//pass the password complexity tests
+		//find the max of the min or max
+		$min = (!empty($this->options['login_password_complexity']['min'])) ? $this->options['login_password_complexity']['min'] : 0;
+		$max = (!empty($this->options['login_password_complexity']['max'])) ? $this->options['login_password_complexity']['min'] : 32;
+		
+		$length = max($min, $max);
+		$new_password = $this->random->generate($length, true);
+		$new_hashed_password = $this->hash_password($new_password, $this->options['hash_method'], $this->options['hash_rounds']);
+		
 		//update
-		//pass back actual password
+		$query = "UPDATE {$this->options['table_users']} SET password = :new_password WHERE id = :user_id";
+		$sth = $this->db->prepare($query);
+		$sth->bindParam('new_password', $new_hashed_password, PDO::PARAM_STR);
+		$sth->bindParam('user_id', $user->id, PDO::PARAM_INT);
+		
+		try{
+		
+			$sth->execute();
+			if($sth->rowCount < 1){
+				$this->errors[] = $this->lang['password_change_unsuccessful'];
+				return false;
+			}
+		
+		}catch(PDOException $db_err){
+		
+			if($this->logger){
+				$this->logger->error("Failed to execute query to reset and update the password hash with user {$user->id}.", ['exception' => $db_err]);
+			}
+			$this->errors[] = $this->lang['password_change_unsuccessful'];
+			return false;
+		
+		}
+		
+		return $new_password;
 	
 	}
 	
