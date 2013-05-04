@@ -17,9 +17,7 @@ use PolyAuth\Language;
 
 //for security
 use PolyAuth\Accounts\BcryptFallback;
-
-//for registration
-use PolyAuth\Emailer;
+use PolyAuth\Accounts\PasswordComplexity;
 
 //for RBAC (to CRUD roles and permissions)
 use PolyAuth\UserAccount;
@@ -27,12 +25,16 @@ use RBAC\Permission;
 use RBAC\Role\Role;
 use RBAC\Manager\RoleManager;
 
+//for registration
+use PolyAuth\Emailer;
+
 class AccountsManager{
 
 	protected $db;
 	protected $options;
 	protected $lang;
 	protected $logger;
+	protected $password_manager;
 	protected $role_manager;
 	protected $emailer;
 	protected $bcrypt_fallback = false;
@@ -48,6 +50,7 @@ class AccountsManager{
 		
 		$this->db = $db;
 		$this->logger = $logger;
+		$this->password_manager = new PasswordComplexity($options, $language);
 		$this->role_manager  = new RoleManager($db, $logger);
 		$this->emailer = new Emailer($db, $options, $language, $logger);
 		
