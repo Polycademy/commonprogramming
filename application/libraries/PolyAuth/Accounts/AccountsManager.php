@@ -87,6 +87,12 @@ class AccountsManager{
 			return false;
 		}
 		
+		//check if password is complex enough
+		if(!$this->password_manager->complex_enough($data['password'])){
+			$this->errors += $this->password_manager->get_errors();
+			return false;
+		}
+		
 		$data['ipAddress'] = $this->prepare_ip($_SERVER['REMOTE_ADDR']);
 		$data['password'] = $this->hash_password($data['password'], $this->options['hash_method'], $this->options['hash_rounds']);
 		
@@ -123,7 +129,7 @@ class AccountsManager{
 		}
 		
 		$registered_user = new UserAccount($last_insert_id);
-		unset($data['password']);
+		unset($data['password']); //don't let the hash be easily accessible!
 		$registered_user->set_user_data($data);
 		
 		//now we've got to add the default roles and permissions
@@ -519,14 +525,72 @@ class AccountsManager{
 	
 	}
 	
-	//allow old_password to be optional, this forces a new password regardless of password checks
+	/**
+	 * Changes the password of the user. If the old password was provided, it will be checked against the user, otherwise the password change will be forced.
+	 * Also passes the password through the complexity checks.
+	 *
+	 * @param $user object
+	 * @param $new_password string
+	 * @param $old_password string optional
+	 * @return boolean
+	 */
 	public function change_password($user, $new_password, $old_password = false){
 	
-		//check old password if it exists
-		//password complexity check (depends on old password do the double password check)
+		//if old password exists, we need to check if it matches the database record
+		if($old_password){
+			$query = "SELECT password FROM {$this->options['table_users']} WHERE id = :user_id";
+			$sth = $this->db->prepare($query);
+			$sth->bindParam('user_id', $user->id, PDO::PARAM_INT);
+			try{
+				$sth->execute();
+				$row = $sth->fetch(PDO::FETCH_OBJ);
+				if(!hash_password_verify($old_password, $row->password)){
+					$this->errors[] = $this->lang['password_change_unsuccessful'];
+					return false;
+				}
+			}catch(PDOException $db_err){
+				if($this->logger){
+					$this->logger->error("Failed to execute query to get the password hash from user {$user->id}.", ['exception' => $db_err]);
+				}
+				$this->errors[] = $this->lang['password_change_unsuccessful'];
+				return false;
+			}
+		}
+		
+		//password complexity check on the new_password
+		if(!$this->password_manager->complex_enough($new_password, $old_password, $user->{$this->options['identity']}){
+			$this->errors += $this->password_manager->get_errors();
+			return false;
+		}
+		
 		//hash new password
+		$password = $this->hash_password(password, $this->options['hash_method'], $this->options['hash_rounds']);
+		
 		//update with new password
-		//return with boolean
+		$query = "UPDATE {$this->options['table_users']} SET password = :new_password WHERE id = :user_id";
+		$sth = $this->db->prepare($query);
+		$sth->bindParam('new_password', $password, PDO::PARAM_STR);
+		$sth->bindParam('user_id', $user->id, PDO::PARAM_INT);
+		
+		try{
+		
+			$sth->execute();
+			if($sth->rowCount < 1){
+				$this->errors[] = $this->lang['password_change_unsuccessful'];
+				return false;
+			}
+		
+		}catch(PDOException $db_err){
+		
+			if($this->logger){
+				$this->logger->error("Failed to execute query to update password hash with user {$user->id}.", ['exception' => $db_err]);
+			}
+			$this->errors[] = $this->lang['password_change_unsuccessful'];
+			return false;
+		
+		}
+		
+		return true;
 	
 	}
 	
