@@ -52,15 +52,15 @@ class Options implements \ArrayAccess{
 			//login options (this is the field used to login with, plus login attempts)
 			'login_identity'					=> 'username', //can be email or username
 			'login_password_complexity'			=> array(
-				'min'		=> 8,
-				'max'		=> 32,
-				'lower'		=> false,
-				'upper'		=> false,
-				'number'	=> false,
-				'special'	=> false,
-				'identity'	=> false, //different from identity?
-				'unique'	=> false,
-			), //can be an array or false or empty array
+				'min'			=> 8,
+				'max'			=> 32,
+				'lowercase'		=> false,
+				'uppercase'		=> false,
+				'number'		=> false,
+				'specialchar'	=> false,
+				'diffuser'		=> false, //different from identity
+				'unique'		=> false,
+			), //can be an array or empty array
 			'login_persistent'					=> true, //allowing remember me or not
 			'login_expiration'					=> 86500, // How long to remember the user (seconds). Set to zero for no expiration
 			'login_expiration_extend'			=> true, //allowing whether autologin extends the login_expiration

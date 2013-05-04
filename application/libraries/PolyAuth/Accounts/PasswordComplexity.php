@@ -1,58 +1,81 @@
 <?php
 
-class PasswordComplexity
-{
-	/** constants - are arbritrary numbers - but used for bitwise **/
-	const REQUIRE_MIN		 = 1;
-	const REQUIRE_MAX		 = 2;
-	const REQUIRE_LOWERCASE   = 4;
-	const REQUIRE_UPPERCASE   = 8;
-	const REQUIRE_NUMBER	  = 16;
+class PasswordComplexity{
+
+	const REQUIRE_MIN = 1;
+	const REQUIRE_MAX = 2;
+	const REQUIRE_LOWERCASE = 4;
+	const REQUIRE_UPPERCASE = 8;
+	const REQUIRE_NUMBER = 16;
 	const REQUIRE_SPECIALCHAR = 32;
-	const REQUIRE_DIFFPASS	= 64;
-	const REQUIRE_DIFFUSER	= 128;
-	const REQUIRE_UNIQUE	  = 256;
-	protected $_passwordMinLength = 6;
-	protected $_passwordMaxLength = 32;
-	protected $_passwordDiffLevel = 3;
-	protected $_uniqueChrRequired = 4;
-	protected $_complexityLevel = 0;
-	protected $_issues = array();
-	/**
-	 * returns the standard options
-	 * @return integer
-	 */
-	public function getComplexityStandard()
-	{
-		return self::REQUIRE_MIN + self::REQUIRE_MAX + self::REQUIRE_LOWERCASE + self::REQUIRE_UPPERCASE + self::REQUIRE_NUMBER;
+	const REQUIRE_DIFFPASS = 64;
+	const REQUIRE_DIFFUSER = 128;
+	const REQUIRE_UNIQUE = 256;
+	
+	protected $options;
+	protected $lang;
+	
+	protected $min;
+	protected $max;
+	protected $diffpass = 3;
+	protected $unique = 4;
+	protected $complexity_level = 0;
+	
+	protected $issues = array();
+	
+	public function __construct(Options $options, Language $language){
+	
+		$this->options = $options;
+		$this->lang = $language;
+		$this->set_complexity($this->options['login_password_complexity']);
+	
 	}
-	/**
-	 *returns all of the options
-	 *@return integer
-	 */
-	public function getComplexityStrict()
-	{
-		$r = new ReflectionClass($this);
-		$complexity = 0;
-		foreach ($r->getConstants() as $constant) {
-			$complexity += $constant;
+	
+	public function set_complexity(array $complexity_options){
+	
+		$this->min = (!empty($complexity_options['min']) $complexity_options['min'] : 0;
+		$this->max = (!empty($complexity_options['max']) $complexity_options['max'] : 0;
+		
+		//if it is false, then no complexity settings
+		if(!empty($complexity_options)){
+		
+			$complexity_level = 0;
+			
+			$r = new ReflectionClass($this);
+			
+			foreach($r->getConstants() as $name => $constant){
+			
+				//REQUIRE_MIN => min
+				$name = explode('_', $name, 2);
+				//check if the option is set and it is not strictly equal to false
+				if(isset($complexity_options[$name] AND $complexity_options[$name] !== false){
+					//add to the complexity level
+					$complexity_level += $constant;
+				}
+			
+			}
+			
+			$this->complexity_level = $complexity_level;
+			
+		}else{
+		
+			//a 0 byte would share no bits with any other number
+			$this->complexity_level = 0;
+			
 		}
-		return $complexity;
+		
 	}
-	public function setComplexity($complexityLevel)
-	{
-		$this->_complexityLevel=$complexityLevel;
-	}
+	
 	/**
 	 * checks for complexity level. If returns false, it has populated the _issues array
 	 */
-	public function complexEnough($newPass, $oldPass, $username)
-	{
+	public function complexEnough($newPass, $oldPass, $username){
+	
 		$enough = TRUE;
 		$r = new ReflectionClass($this);
-		foreach ($r->getConstants() as $name=>$constant) {
+		foreach ($r->getConstants() as $name => $constant) {
 			/** means we have to check that type then **/
-			if ($this->_complexityLevel & $constant) {
+			if ($this->complexityLevel & $constant) {
 				/** REQUIRE_MIN becomes _requireMin() **/
 				$parts = explode('_', $name, 2);
 				$funcName = "_{$parts[0]}" . ucwords($parts[1]);
@@ -64,6 +87,7 @@ class PasswordComplexity
 			}
 		}
 		return $enough;
+		
 	}
 	public function getPasswordIssues()
 	{
