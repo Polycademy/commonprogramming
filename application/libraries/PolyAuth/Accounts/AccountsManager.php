@@ -254,7 +254,31 @@ class AccountsManager{
 	}
 	
 	/**
-	 * Activates the new user
+	 * Either resends the activation email, or it can be used to manually begin sending the activation email.
+	 * It regenerates the activation code as well.
+	 *
+	 * @param $user object
+	 * @return boolean
+	 */
+	public function reactivate(UserAccount $user){
+	
+		if($activation_code = $this->deactivate($user)){
+		
+			$user->activationCode = $activation_code;
+		
+			//we don't need to check what the reg_activation is, give options to the end user
+			if($this->options['email'] AND $user->email){
+				return $this->emailer->send_activation($user);
+			}
+		
+		}
+		
+		return false;
+	
+	}
+	
+	/**
+	 * Activates the new user given the activation code, this is used after the activation email has been sent and received
 	 *
 	 * @param $user object
 	 * @param $activation_code string - this is optional so you can manually activate a user without checking the activation code
@@ -300,11 +324,6 @@ class AccountsManager{
 			return false;
 		
 		}
-	
-	}
-	
-	//use this function when someone needs to be resent the activation emails, or be reactivated
-	public function reactivate(){
 	
 	}
 	
