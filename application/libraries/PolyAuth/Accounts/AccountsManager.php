@@ -566,10 +566,24 @@ class AccountsManager{
 	
 	}
 	
-	//takes two arrays
-	//first array is the array of roles to descriptions
-	//second array is an array of roles to array of permission to permission description
-	//matches them up (discards non matches anomalies)
+	//show all the permissions of a role
+	//accepts an array of roles, and returns an array of roles to description and roles to permission to description
+	public function get_roles_permissions(){
+	
+		/*
+		$array = array(
+			'admin'	=> array(
+				'desc' => 'Administrators Role',
+				'perms'	=> array(
+					'perm' => 'Description of the Perm'
+				),
+			),
+		);
+		*/
+	
+	}
+	
+	//uses a similar array to the above!
 	//creates the permissions, assigns them to the roles, saves them
 	public function register_roles_permissions(){
 	
