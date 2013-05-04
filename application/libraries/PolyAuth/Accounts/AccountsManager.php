@@ -626,17 +626,7 @@ class AccountsManager{
 	public function force_password_change(array $users){
 	
 		foreach($users as $user){
-		
-			if($user instanceof UserAccount){
-			
-				$in_sql[] = $user->id;
-			
-			}else{
-			
-				return false;
-			
-			}
-		
+			$in_sql[] = $user->id;
 		}
 		
 		$in_sql = implode(',', $in_sql);
