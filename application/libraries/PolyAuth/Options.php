@@ -66,7 +66,7 @@ class Options implements \ArrayAccess{
 			'login_expiration_extend'			=> true, //allowing whether autologin extends the login_expiration
 			'login_attempts'					=> 0, //if 0, then it is disabled
 			'login_lockout'						=> 0, //lockout time in seconds
-			'login_forgot_expiration'			=> 0, //how long before the temporary password expires
+			'login_forgot_expiration'			=> 0, //how long before the temporary password expires in seconds!
 			//registration options
 			'reg_activation'					=> false, //can be email, manual, or false
 		);

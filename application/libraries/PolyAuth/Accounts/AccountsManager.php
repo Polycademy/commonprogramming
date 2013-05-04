@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 use PolyAuth\Options;
 
 //for languages
-use PolyAuth\Language;
+use PolyAuth\Language; //We need to allow to change language options
 
 //for security
 use PolyAuth\Accounts\BcryptFallback;
@@ -173,7 +173,7 @@ class AccountsManager{
 	}
 	
 	/**
-	 * Checks for duplicate identity
+	 * Checks for duplicate identity, returns false if the identity already exists, returns true if identity doesn't exist
 	 *
 	 * @param $identity string - depends on the options
 	 * @return boolean
@@ -279,6 +279,7 @@ class AccountsManager{
 	
 	/**
 	 * Activates the new user given the activation code, this is used after the activation email has been sent and received
+	 * Can also be used to manually activate
 	 *
 	 * @param $user object
 	 * @param $activation_code string - this is optional so you can manually activate a user without checking the activation code
@@ -290,40 +291,14 @@ class AccountsManager{
 			//force activate (if the activation code doesn't exist)
 			return $this->force_activate($user->id);
 		}
-	
-		//if the activation code matches with the user_id's activation code, then update the row to make it active!
-		$query = "SELECT id from {$this->options['table_users']} WHERE id = :id AND activationCode = :activation_code";
-		$sth = $this->db->prepare($query);
-		$sth->bindParam(':id', $user->id, PDO::PARAM_INT);
-		$sth->bindParam(':activation_code', $activation_code, PDO::PARAM_STR);
 		
-		try{
-		
-			//test if there are any results
-			$sth->execute();
-			
-			if($sth->fetch(PDO::FETCH_NUM) > 0){
-			
-				//we got a match, let's activate them!
-				return $this->force_activate($user->id);
-				
-			}else{
-			
-				//no match, no activation
-				$this->errors[] = $this->lang['activate_unsuccessful'];
-				return false;
-				
-			}
-		
-		}catch(PDOException $db_err){
-		
-			if($this->logger){
-				$this->logger->error('Failed to execute query to grab the user with the relevant id and activation code.', ['exception' => $db_err]);
-			}
-			$this->errors[] = $this->lang['activate_unsuccessful'];
-			return false;
-		
+		//$user will already contain the activationCode and id
+		if($user->activationCode == $activation_code){
+			return $this->force_activate($user->id);
 		}
+		
+		$this->errors[] = $this->lang['activate_unsuccessful'];
+		return false;
 	
 	}
 	
@@ -440,7 +415,18 @@ class AccountsManager{
 	
 	//checks if the OTP is correct and within the time limit
 	//make sure to see if time limit is 0, otherwise, the time limit is forever!
-	public function forgotten_check(UserAccount $user, $activation_code){
+	public function forgotten_check(UserAccount $user, $forgotten_code){
+	
+		$forgotten_time = strtotime($user->forgottenTime);
+		$current_time = strtotime(date('Y-m-d H:i:s'));
+		$allowed_duration = $this->options['login_forgot_expiration'];
+	
+		if($user->forgottenCode == $forgotten_code){
+		
+		}
+		
+		$this->errors[] = $this->lang['forgot_check_unsuccessful'];
+		return false;
 	
 	}
 	
@@ -470,9 +456,12 @@ class AccountsManager{
 	
 	}
 	
+	//THIS IS WHAT YOU USE ALWAYS TO GET A USER
 	public function get_user($user_id){
 	
 		//return the RBAC user object, which you can test for permissions or grab its user data or session data
+		
+		//return false if user does not exist!
 		
 	}
 	

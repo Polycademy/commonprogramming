@@ -21,6 +21,7 @@ class Language implements \ArrayAccess{
 			'password_change_unsuccessful'			=> 'Unable to Change Password',
 			'forgot_password_unsuccessful'			=> 'Unable to Reset Password',
 			'forgot_unsuccessful'					=> 'Unable to update forgotten code and dates.',
+			'forgot_check_unsuccessful'				=> 'The forgotten code is invalid or forgotten time limit has been exceeded.',
 			// Activation
 			'activate_unsuccessful'					=> 'Unable to Activate Account',
 			'deactivate_unsuccessful'				=> 'Unable to De-Activate Account',
