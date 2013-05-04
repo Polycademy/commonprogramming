@@ -9,7 +9,7 @@ class PasswordComplexity{
 	const REQUIRE_NUMBER = 16;
 	const REQUIRE_SPECIALCHAR = 32;
 	const REQUIRE_DIFFPASS = 64;
-	const REQUIRE_DIFFUSER = 128;
+	const REQUIRE_DIFFIDENTITY = 128;
 	const REQUIRE_UNIQUE = 256;
 	
 	protected $options;
@@ -68,7 +68,7 @@ class PasswordComplexity{
 		
 	}
 	
-	public function complex_enough($new_pass, $old_pass = false, $username = false){
+	public function complex_enough($new_pass, $old_pass = false, $identity = false){
 	
 		$enough = TRUE;
 		
@@ -81,7 +81,7 @@ class PasswordComplexity{
 				if($this->complexity_level & $constant){
 				
 					//apparently case does not matter here
-					$result = call_user_func_array(array($this, $name), array($new_pass, $old_pass, $username));
+					$result = call_user_func_array(array($this, $name), array($new_pass, $old_pass, $identity));
 					
 					if($result !== TRUE){
 						$enough = FALSE;
@@ -168,12 +168,12 @@ class PasswordComplexity{
 		
 	}
 	
-	protected function require_diffuser($new_pass, $old_pass, $username){
+	protected function require_diffidentity($new_pass, $old_pass, $identity){
 	
-		//if the username was false, then the check is optional
-		if($username){
-			if (stripos($new_pass, $username) !== FALSE) {
-				return $this->lang['password_diffuser'];
+		//if the identity was false, then the check is optional
+		if($identity){
+			if (stripos($new_pass, $identity) !== FALSE) {
+				return $this->lang['password_diffidentity'];
 			}
 		}
 		return true;

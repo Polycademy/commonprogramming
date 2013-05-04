@@ -26,7 +26,7 @@ class Language implements \ArrayAccess{
 			'password_number'						=> 'Password requires a number.',
 			'password_specialchar'					=> 'Password requires a special character.',
 			'password_diffpass'						=> 'Password must be a bit more different than the last password.',
-			'password_diffuser'						=> 'Password should not contain your username.',
+			'password_diffidentity'					=> 'Password should not contain your identity.',
 			'password_unique'						=> 'Password must contain more unique characters.',
 			'forgot_password_unsuccessful'			=> 'Unable to Reset Password',
 			'forgot_unsuccessful'					=> 'Unable to update forgotten code and dates.',

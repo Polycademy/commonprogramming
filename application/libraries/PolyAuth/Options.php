@@ -59,7 +59,7 @@ class Options implements \ArrayAccess{
 				'number'		=> false,
 				'specialchar'	=> false,
 				'diffpass'		=> false, //number of characters different from old password ('' or false or 3)
-				'diffuser'		=> false,
+				'diffidentity'	=> false,
 				'unique'		=> false, //number of unique characters ('' or false or 4) ('' defaults to 4)
 			), //can be an array or empty array
 			'login_persistent'					=> true, //allowing remember me or not
