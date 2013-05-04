@@ -537,12 +537,6 @@ class AccountsManager{
 	
 	}
 	
-	public function get_users(){
-	
-		//return all users as RBAC objects
-	
-	}
-	
 	//THIS IS WHAT YOU USE ALWAYS TO GET A USER
 	public function get_user($user_id){
 	
@@ -552,15 +546,21 @@ class AccountsManager{
 		
 	}
 	
+	public function get_users(){
+	
+		//return all users as RBAC objects
+	
+	}
+	
 	//get all users based on array of roles
-	public function get_user_by_role(array $roles){
+	public function get_users_by_role(array $roles){
 	
 		//returns an array of RBAC user objects
 	
 	}
 	
 	//get all the users based on array of permissions
-	public function get_user_by_permission(array $permissions){
+	public function get_users_by_permission(array $permissions){
 	
 		//returns an array of RBAC user objects
 	
@@ -568,7 +568,7 @@ class AccountsManager{
 	
 	//show all the permissions of a role
 	//accepts an array of roles, and returns an array of roles to description and roles to permission to description
-	public function get_roles_permissions(){
+	public function get_roles_permissions(array $requested_roles){
 	
 		/*
 		$array = array(

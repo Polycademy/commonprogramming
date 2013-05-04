@@ -30,6 +30,10 @@ class UserAccount extends Subject{
 		return isset($roles[$role]);
 	}
 	
+	public function get_permissions(){
+		return $this->getRoleset()->getPermissions();
+	}
+	
 	public function has_permission($permission){
 		return $this->hasPermission($permission);
 	}
