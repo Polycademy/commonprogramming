@@ -43,10 +43,10 @@ class LoginLogout{
 	
 	protected $errors = array();
 
-	public function __construct(PDO $db, Options $options, SessionInterface $session_handler = null, LoggerInterface $logger = null){
+	public function __construct(PDO $db, Options $options, Language $language, SessionInterface $session_handler = null, LoggerInterface $logger = null){
 	
 		$this->options = $options;
-		$this->lang = new Language;
+		$this->lang = $language;
 		
 		$this->db = $db;
 		$this->logger = $logger;
@@ -58,7 +58,7 @@ class LoginLogout{
 			$this->options['cookie_httponly']
 		);
 		$this->session_manager = new SessionManager(new SegmentFactory, new CsrfTokenFactory);
-		$this->accounts_manager = new AccountsManager($db, $options, $logger); //to mainly use the password hash verify
+		$this->accounts_manager = new AccountsManager($db, $options, $language, $logger); //to mainly use the password hash verify
 		$this->role_manager  = new RoleManager($db, $logger);
 		
 		$this->startyourengines();

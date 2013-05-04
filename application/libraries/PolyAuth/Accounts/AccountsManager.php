@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 use PolyAuth\Options;
 
 //for languages
-use PolyAuth\Language; //We need to allow to change language options
+use PolyAuth\Language;
 
 //for security
 use PolyAuth\Accounts\BcryptFallback;
@@ -41,15 +41,15 @@ class AccountsManager{
 	
 	//expects PDO connection (potentially using $this->db->conn_id)
 	//SessionInterface is a copy of the PHP5.4.0 SessionHandlerInterface, this allows backwards compatibility
-	public function __construct(PDO $db, Options $options, LoggerInterface $logger = null){
+	public function __construct(PDO $db, Options $options, Language $language, LoggerInterface $logger = null){
 	
 		$this->options = $options;
-		$this->lang = new Language;
+		$this->lang = $language;
 		
 		$this->db = $db;
 		$this->logger = $logger;
 		$this->role_manager  = new RoleManager($db, $logger);
-		$this->emailer = new Emailer($db, $options, $logger);
+		$this->emailer = new Emailer($db, $options, $language, $logger);
 		
 		//if you use bcrypt fallback, you must always use bcrypt fallback, you cannot switch servers!
 		if($this->options['hash_fallback']){
@@ -262,12 +262,11 @@ class AccountsManager{
 	 */
 	public function reactivate(UserAccount $user){
 	
-		if($activation_code = $this->deactivate($user)){
-		
-			$user->activationCode = $activation_code;
+		if($this->deactivate($user)){
 		
 			//we don't need to check what the reg_activation is, give options to the end user
 			if($this->options['email'] AND $user->email){
+				//$user will contain the new activation code
 				return $this->emailer->send_activation($user);
 			}
 		
@@ -289,12 +288,12 @@ class AccountsManager{
 	
 		if(!$activation_code){
 			//force activate (if the activation code doesn't exist)
-			return $this->force_activate($user->id);
+			return $this->force_activate($user);
 		}
 		
 		//$user will already contain the activationCode and id
 		if($user->activationCode == $activation_code){
-			return $this->force_activate($user->id);
+			return $this->force_activate($user);
 		}
 		
 		$this->errors[] = $this->lang['activate_unsuccessful'];
@@ -302,21 +301,23 @@ class AccountsManager{
 	
 	}
 	
-	protected function force_activate($user_id){
+	protected function force_activate($user){
 	
-		$query = "UPDATE {$this->options['table_users']} SET active = 1, activationCode = '' WHERE id = :id";
+		$query = "UPDATE {$this->options['table_users']} SET active = 1, activationCode = NULL WHERE id = :id";
 		$sth = $this->db->prepare($query);
-		$sth->bindParam(':id', $user_id, PDO::PARAM_INT);
+		$sth->bindParam(':id', $user->id, PDO::PARAM_INT);
 		
 		try{
 		
 			$sth->execute();
+			$user->active = 1;
+			$user->activationCode = null;
 			return true;
 		
 		}catch(PDOException $db_err){
 		
 			if($this->logger){
-				$this->logger->error("Failed to execute query to activate user $user_id.", ['exception' => $db_err]);
+				$this->logger->error("Failed to execute query to activate user {$user->id}.", ['exception' => $db_err]);
 			}
 			$this->errors[] = $this->lang['activate_unsuccessful'];
 			return false;
@@ -343,6 +344,8 @@ class AccountsManager{
 		try{
 		
 			$sth->execute();
+			$user->active = 0;
+			$user->activationCode = $activation_code;
 			return $activation_code;
 		
 		}catch(PDOException $db_err){
@@ -413,40 +416,124 @@ class AccountsManager{
 	
 	}
 	
-	//checks if the OTP is correct and within the time limit
-	//make sure to see if time limit is 0, otherwise, the time limit is forever!
+	/**
+	 * Checks if the forgotten code is valid and that it has been used within the time limit
+	 *
+	 * @param $user object
+	 * @param $forgotten_code string
+	 * @return boolean
+	 */
 	public function forgotten_check(UserAccount $user, $forgotten_code){
 	
-		$forgotten_time = strtotime($user->forgottenTime);
-		$current_time = strtotime(date('Y-m-d H:i:s'));
-		$allowed_duration = $this->options['login_forgot_expiration'];
-	
-		if($user->forgottenCode == $forgotten_code){
+		//check if there is such thing as a forgottenCode and forgottenTime
+		if(!empty($user->forgottenCode) AND $user->forgottenCode == $forgotten_code){
+		
+			$allowed_duration = $this->options['login_forgot_expiration'];
+			
+			if($allowed_duration != 0){
+		
+				$forgotten_time = strtotime($user->forgottenTime);
+				//add the allowed duration the forgotten time
+				$forgotten_time_duration = strtotime("+ $allowed_duration seconds", $forgotten_time);
+				//compare with the current time
+				$current_time = strtotime(date('Y-m-d H:i:s'));
+				
+				if($current_time > $forgotten_time_duration){
+				
+					//we have exceeded the time, so we need to clear the forgotten so that it defaults back to normal
+					//or else there'd be no way of resolving this issue
+					$this->forgotten_clear($user);
+					$this->errors[] = $this->lang['forgot_check_unsuccessful'];
+					return false;
+				
+				}
+			
+			}
+			
+			//at this point everything should be good to go
+			return true;
 		
 		}
-		
+
+		//if the forgottenCode doesn't exist or the code doesn't match, then we just return false, no need to clear
 		$this->errors[] = $this->lang['forgot_check_unsuccessful'];
 		return false;
 	
 	}
 	
-	//if the forgotten check goes through. Updates with a new password and clear the forgotten
+	/**
+	 * Finishes the forgotten cycle, clears the forgotten code and updates the user with the new password
+	 *
+	 * @param $user object
+	 * @param $forgotten_code string
+	 * @return boolean
+	 */
 	public function forgotten_complete(UserAccount $user, $new_password){
 	
-		//hashing and whateva
+		//clear the forgotten first and update with new password
+		if($this->forgotten_clear($user) AND $this->change_password($user, $new_password)){
+			return true;
+		}
+		return false;
 	
 	}
 	
-	//on finish of forgotten complete or when the forgotten time has exceeded its time limit
-	public function clear_forgotten(UserAccount $user){
+	/**
+	 * Clears the forgotten code and forgotten time when we have completed the cycle or if the time limit was exceeded
+	 *
+	 * @param $user object
+	 * @return boolean
+	 */
+	public function forgotten_clear(UserAccount $user){
+	
+		$query = "UPDATE {$this->options['table_users']} SET forgottenCode = NULL, forgottenTime = NULL WHERE id = :user_id";
+		$sth = $this->db->prepare($query);
+		$sth->bindParam('user_id', $user->id, PDO::PARAM_INT);
+		
+		try{
+		
+			$sth->execute();
+			if($sth->rowCount < 1){
+				//no one was updated
+				$this->errors[] = $this->lang['forgot_unsuccessful'];
+				return false;
+			}
+			
+			$user->forgottenCode = null;
+			$user->forgottenTime = null;
+			
+			return true;
+		
+		}catch(PDOException $db_err){
+		
+			if($this->logger){
+				$this->logger->error("Failed to execute query to clear the forgotten code and forgotten time.", ['exception' => $db_err]);
+			}
+			$this->errors[] = $this->lang['forgot_unsuccessful'];
+			return false;
+		
+		}
 	
 	}
 	
-	public function reset_password(){
+	//allow old_password to be optional, this forces a new password regardless of password checks
+	public function change_password($user, $new_password, $old_password = false){
+	
+		//check old password if it exists
+		//password complexity check (depends on old password do the double password check)
+		//hash new password
+		//update with new password
+		//return with boolean
 	
 	}
 	
-	public function change_password(){
+	//not used in this library, but this will randomise the password and return the actual password (not the hash)
+	public function reset_password($user){
+	
+		//randomise the password
+		//pass the password complexity tests
+		//update
+		//pass back actual password
 	
 	}
 	

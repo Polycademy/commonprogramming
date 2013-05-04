@@ -28,9 +28,10 @@ class Emailer{
 	
 	protected $errors = array();
 
-	public function __construct(PDO $db, Options $options, LoggerInterface $logger = null){
+	public function __construct(PDO $db, Options $options, Language $language, LoggerInterface $logger = null){
 	
 		$this->options = $options;
+		$this->lang = $language;
 		$this->db = $db;
 		$this->logger = $logger;
 		$this->mailer = new PHPMailer;
