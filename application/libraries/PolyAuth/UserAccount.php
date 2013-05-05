@@ -42,8 +42,20 @@ class UserAccount extends Subject{
 		return $this->requirePermission($permission);
 	}
 	
-	public function set_user_data(array $data){
+	public function set_user_data($data){
+	
+		$type = gettype($data);
+		
+		if($type != 'object' OR != 'array'){
+			return false;
+		}
+		
+		if($type == 'object'){
+			$data = get_object_vars($data);
+		}
+		
 		$this->user_data = array_merge($this->user_data, $data);
+		
 	}
 	
 	public function get_user_data(){

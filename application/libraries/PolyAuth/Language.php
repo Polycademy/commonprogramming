@@ -36,6 +36,8 @@ class Language implements \ArrayAccess{
 			'activate_unsuccessful'					=> 'Unable to Activate Account',
 			'deactivate_unsuccessful'				=> 'Unable to De-Activate Account',
 			'activation_email_unsuccessful'			=> 'Unable to Send Activation Email',
+			// User
+			'user_select_unsuccessful'				=> 'Could not find the user or users.',
 			// Login / Logout
 			'login_successful'						=> 'Logged In Successfully',
 			'login_unsuccessful'					=> 'Incorrect Login',
@@ -46,10 +48,10 @@ class Language implements \ArrayAccess{
 			'update_unsuccessful'					=> 'Unable to Update Account Information',
 			'delete_unsuccessful'					=> 'Unable to Delete User',
 			'delete_already'						=> 'User is already Deleted.',
-			// Groups
+			// Roles
 			'role_already_exists'					=> 'Role name already taken',
 			'role_delete_unsuccessful'				=> 'Unable to delete role',
-			//email
+			// Email
 			'email_activation_subject'				=> 'Account Activation PolyAuth',
 			'email_forgotten_identity_subject'		=> 'Forgotten Identity PolyAuth',
 			'email_forgotten_password_subject'		=> 'Forgotten Password PolyAuth',

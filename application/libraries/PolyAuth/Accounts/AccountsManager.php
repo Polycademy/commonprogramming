@@ -132,9 +132,8 @@ class AccountsManager{
 			
 		}
 		
-		$registered_user = new UserAccount($last_insert_id);
-		unset($data['password']); //don't let the hash be easily accessible!
-		$registered_user->set_user_data($data);
+		//grab the user's data that we just inserted
+		$registered_user = $this->get_user($last_insert_id);
 		
 		//now we've got to add the default roles and permissions
 		if(!$registered_user = $this->register_roles($registered_user, array($this->options['role_default']))){
@@ -201,7 +200,7 @@ class AccountsManager{
 		
 			//there basically should be nothing returned, if something is returned then identity check fails
 			$sth->execute();
-			if($sth->fetch(PDO::FETCH_NUM) > 0){
+			if($sth->fetch()){
 				$this->errors[] = $this->lang["account_creation_duplicate_{$this->options['login_identity']}"];
 				return false;
 			}
@@ -652,18 +651,104 @@ class AccountsManager{
 	
 	}
 	
-	//THIS IS WHAT YOU USE ALWAYS TO GET A USER
+	/**
+	 * Gets the user according to their id. The user is an augmented object of UserAccount including all the user's data (minus the password) and with any current permissions loaded in.
+	 *
+	 * @param $user_id int
+	 * @return $user object
+	 */
 	public function get_user($user_id){
 	
-		//return the RBAC user object, which you can test for permissions or grab its user data or session data
+		$query = "SELECT * FROM {$this->options['table_users']} WHERE id = :user_id";
+		$sth = $this->db->prepare($query);
+		$sth->bindParam('user_id', $user_id, PDO::PARAM_INT);
 		
-		//return false if user does not exist!
+		try{
+		
+			$sth->execute();
+			$row = $sth->fetch(PDO::FETCH_OBJ);
+			if(!$row){
+				$this->errors[] = $this->lang('user_select_unsuccessful');
+				return false;
+			}
+		
+		}catch(PDOException $db_err){
+		
+			if($this->logger){
+				$this->logger->error("Failed to execute query to select user $user_id.", ['exception' => $db_err]);
+			}
+			$this->errors[] = $this->lang['user_select_unsuccessful'];
+			return false;
+		
+		}
+		
+		//load in the data into the UserAccount
+		unset($row->password);
+		$user = new UserAccount($row->id);
+		$user->set_user_data($row);
+		
+		//load in the roles and permissions of the user
+		$this->role_manager->loadSubjectRoles($user);
+		
+		return $user;
 		
 	}
 	
-	public function get_users(){
-	
-		//return all users as RBAC objects
+	/**
+	 * Gets an array of users based on their user ids
+	 *
+	 * @param $user_ids array
+	 * @return $users array | null - If it is an array: id => UserAccount | null
+	 */
+	public function get_users(array $user_ids){
+		
+		//some users may not exist, we'll return null for the ones that don't exist
+		$list_of_ids = implode(',', $user_ids);
+		$query = "SELECT * FROM {$this->options['table_users']} WHERE id IN ($list_of_ids)";
+		$sth = $this->db->prepare();
+		
+		try{
+		
+			$sth->execute();
+            $result = $sth->fetchAll(PDO::FETCH_OBJ);
+			if(!$result){
+				return null;
+			}
+			
+		}catch(PDOException $db_err){
+		
+			if($this->logger){
+				$this->logger->error("Failed to execute query to select users of $list_of_ids.", ['exception' => $db_err]);
+			}
+			$this->errors[] = $this->lang['user_select_unsuccessful'];
+			return false;
+		
+		}
+		
+		$output_users = array();
+		
+		//looping through the user_ids array
+		foreach($user_ids as $id){
+		
+			//loop through the result array, and check if the id matches any one of the row's id
+			foreach($result as $row){
+			
+				if($id == $row->id){
+				
+					$output_users[$id] = $row;
+				
+				}else{
+				
+					//if the ids don't match, we'll set it to null, but this can be overwritten in the next iteration
+					$output_users[$id] = null;
+				
+				}
+			
+			}
+		
+		}
+		
+		return $output_users	
 	
 	}
 	
