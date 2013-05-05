@@ -698,7 +698,7 @@ class AccountsManager{
 	 * Gets an array of users based on their user ids
 	 *
 	 * @param $user_ids array
-	 * @return $users array | null - If it is an array: id => UserAccount | null
+	 * @return $users array | null - Array of (id => UserAccount)
 	 */
 	public function get_users(array $user_ids){
 		
@@ -727,24 +727,13 @@ class AccountsManager{
 		
 		$output_users = array();
 		
-		//looping through the user_ids array
-		foreach($user_ids as $id){
-		
-			//loop through the result array, and check if the id matches any one of the row's id
-			foreach($result as $row){
+		foreach($result as $row){
 			
-				if($id == $row->id){
-				
-					$output_users[$id] = $row;
-				
-				}else{
-				
-					//if the ids don't match, we'll set it to null, but this can be overwritten in the next iteration
-					$output_users[$id] = null;
-				
-				}
-			
-			}
+			unset($row->password);
+			$user = new UserAccount($row->id);
+			$user->set_user_data($row);
+			$this->role_manager->loadSubjectRoles($user);
+			$output_users[$id] = $user;
 		
 		}
 		
@@ -752,10 +741,62 @@ class AccountsManager{
 	
 	}
 	
-	//get all users based on array of roles
+	/**
+	 * Gets an array of users based on an array of roles
+	 *
+	 * @param $roles array
+	 * @return $users array | null
+	 */
 	public function get_users_by_role(array $roles){
-	
-		//returns an array of RBAC user objects
+		
+		$role_ids = array();
+		
+		foreach($roles as $role_name){
+			//this could be false if the role does not exist
+			$role_object = $this->role_manager->roleFetchByName($role_name);
+			if($role_object){
+				$role_ids[] = $role_object->id;
+			}
+		}
+		
+		if(empty($role_ids)){
+			//no roles exist
+			$this->errors[] = $this->lang['role_not_exists'];
+			return null;
+		}
+		
+		$role_ids = implode(',', $role_ids);
+		
+		$query = "SELECT subject_id FROM auth_subject_role WHERE subject_role_id IN ($role_ids)";
+		$sth = $this->db->prepare($query);
+		
+		try{
+			
+			$sth->execute();
+			$result = $sth->fetchAll(PDO::FETCH_OBJ);
+			if(!$result){
+				//no users correspond to any of the roles
+				$this->errors[] = $this->lang['user_role_select_empty'];
+				return null;
+			}
+		
+		}catch(PDOException $db_err){
+		
+			if($this->logger){
+				$this->logger->error("Failed to execute query to select subjects from auth subject role based on subject role ids $role_ids", ['exception' => $db_err]);
+			}
+			$this->errors[] = $this->lang['user_select_unsuccessful'];
+			return false;
+		
+		}
+		
+		$user_ids = array();
+		
+		foreach($result as $row){
+			$user_ids[] = $row->subject_id;
+		}
+		
+		return $this->get_users($user_ids);
 	
 	}
 	
@@ -763,6 +804,7 @@ class AccountsManager{
 	public function get_users_by_permission(array $permissions){
 	
 		//returns an array of RBAC user objects
+		//can use a triple join to speed up the query
 	
 	}
 	

@@ -38,6 +38,8 @@ class Language implements \ArrayAccess{
 			'activation_email_unsuccessful'			=> 'Unable to Send Activation Email',
 			// User
 			'user_select_unsuccessful'				=> 'Could not find the user or users.',
+			'user_role_select_empty'				=> 'No users were found corresponding to the specified roles.',
+			'user_role_select_unsuccessful'			=> 'Could not select users based on roles.',
 			// Login / Logout
 			'login_successful'						=> 'Logged In Successfully',
 			'login_unsuccessful'					=> 'Incorrect Login',
@@ -49,6 +51,7 @@ class Language implements \ArrayAccess{
 			'delete_unsuccessful'					=> 'Unable to Delete User',
 			'delete_already'						=> 'User is already Deleted.',
 			// Roles
+			'role_not_exists'						=> 'Specified role(s) don\'t exist.',
 			'role_already_exists'					=> 'Role name already taken',
 			'role_delete_unsuccessful'				=> 'Unable to delete role',
 			// Email
