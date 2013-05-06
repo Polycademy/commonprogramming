@@ -851,7 +851,7 @@ class AccountsManager{
 		$roles = array();
 	
 		foreach($requested_roles as $role_name){
-			if($role = $this->role_manager->fetchRoleByName($role_name)){
+			if($role = $this->role_manager->roleFetchByName($role_name)){
 				$roles[$role_name] = $role;
 			}
 		}
@@ -871,7 +871,7 @@ class AccountsManager{
 	 * Also capable of updating the role descriptions
 	 * Use this function when you're constructing an RBAC interface for administrators to create new roles/permissions
 	 *
-	 * $new_roles_permissions is accepted in this manner:
+	 * $roles_permissions is accepted in this manner:
 	 * 	array(
 	 * 		'role_name' => array(
 	 * 			'desc' => 'Description of Role',
@@ -889,21 +889,26 @@ class AccountsManager{
 	 * 		),
 	 * 	);
 	 *
-	 * @param $new_roles_permissions array
+	 * @param $roles_permissions array
 	 * @return $roles array of objects
 	 */
-	public function register_roles_permissions(array $new_roles_permissions){
+	public function register_roles_permissions(array $roles_permissions){
 	
 		$role_names = array();
 	
 		//cycle through the role names
-		foreach($new_roles_permissions as $role_name => $role_data){
+		foreach($roles_permissions as $role_name => $role_data){
 		
 			//we send role name and description to register role
 			if(isset($role_data['desc']) AND is_string($role_data['desc'])){
 				$role_object = $this->register_role($role_name, $role_data['desc']);
 			}else{
 				$role_object = $this->register_role($role_name);
+			}
+			
+			//if any one of the roles failed to be registered (created/updated), fail it
+			if(!role_object){
+				return false;
 			}
 			
 			//at this point role object has already been created or updated
@@ -954,15 +959,16 @@ class AccountsManager{
 	
 	/**
 	 * Creates or updates a single role given a role name and optionally a role description
+	 * Use this function if you just want to register a single role.
 	 *
 	 * @param $role_name string
-	 * @param $role_desc strin
+	 * @param $role_desc string
 	 * @return $roles array of objects
 	 */
 	public function register_role($role_name, $role_desc = false){
 	
 		//check if the role already exists
-		if($role_object = $this->role_manager->fetchRoleByName($role_name){
+		if($role_object = $this->role_manager->roleFetchByName($role_name){
 			//update the existing role (if the role_desc actually exists)
 			$role_object->description = ($role_desc) ? $role_desc : $role_object->description;
 		}else{
@@ -981,35 +987,127 @@ class AccountsManager{
 	}
 	
 	/**
-	 * Deletes Roles and Permissions. Roles that don't exist will be ignored.
+	 * Creates or updates an array of roles. The array can be associative between role_name => role_desc or just role_name
 	 *
-	 * $new_roles_permissions is accepted in this manner:
+	 * @param $roles array
+	 * @return $output_roles array of objects
+	 */
+	public function register_roles(array $roles){
+	
+		$output_roles = array();
+	
+		foreach($roles as $key => $value){
+		
+			if(is_string($key)){
+				if(!$role = $this->register_role($key, $value)){
+					return false;
+				}
+			}else{
+				if(!$role = $this->register_role($value)){
+					return false;
+				}
+			}
+			
+			$output_roles[$key] = $role;
+			
+		}
+		
+		return $output_roles;
+	
+	}
+	
+	/**
+	 * Deletes Roles and their associated Permissions. Use this to delete roles by them selves too
+	 * Roles that don't exist will be ignored, their associated permissions will also be ignored.
+	 *
+	 * $roles_permissions is accepted in this manner:
 	 * 	array(
 	 * 		'role_name' => array(
-	 * 			'desc' => 'Description of Role',
-	 * 			'perms' => array( //<- these are optional (empty array still updates; non-existent key is ignored)
-	 * 				'perm_name'	=> 'perm_desc'
-	 * 			)
+	 * 			'perm_name',
+	 * 			'perm_name2',
 	 * 		),
-	 * 		'role_name' => array(
-	 * 			'desc' => '', //<- this is also optional (empty string still updates; non-existent key is ignored)
-	 * 		),
-	 * 		'role_name' => array(
-	 * 			'perms' => array(
-	 * 				'perm_name' => '', //<- perm_desc is not optional but can be left as an empty string
-	 * 			),
-	 * 		),
+	 * 		'role_name',
 	 * 	);
 	 *
-	 * @param $new_roles_permissions array
-	 * @return $roles array of objects
+	 * @param $role_permissions
+	 * @return boolean
 	 */
 	public function delete_roles_permissions(array $roles_permissions){
 	
-		//expects array: ('role' => array('perm', 'perm');)
-		//OR array: ('role1', 'role2')
-		//OR array: ('role1', 'role2' => array('perm'));
-		//it either deletes a role completely OR deletes a permission as part of a role, but keeps the role
+		foreach($role_permissions as $key => $value){
+		
+			if(is_array($value)){
+			
+				//delete permissions as well
+				if($role_object = $this->role_manager->roleFetchByName($key)){
+				
+					foreach($value as $permission){
+					
+						if(!$this->delete_permission($permission)){
+							return false;
+						}
+					
+					}
+					
+					if(!$this->role_manager->roleDelete($role_object)){
+						$this->errors[] = $this->lang('role_delete_unsuccessful');
+						return false;
+					}
+				
+				}
+			
+			}else{
+			
+				//just delete the role
+				if($role_object = $this->role_manager->roleFetchByName($value)){
+				
+					if(!$this->role_manager->roleDelete($role_object)){
+						$this->errors[] = $this->lang('role_delete_unsuccessful');
+						return false;
+					}
+				
+				}
+			
+			}
+		
+		}
+		
+		return true;
+	
+	}
+	
+	/**
+	 * Delete a single permission
+	 *
+	 * @param $permission_name string
+	 * @return boolean
+	 */
+	public function delete_permission($permission_name){
+	
+		if($permission_object = $this->role_manager->permissionFetchByName($permission){
+			if(!$this->role_manager->permissionDelete($permission_object)){
+				$this->errors[] = $this->lang('permission_delete_unsuccessful');
+				return false;
+			}
+		}
+		return true;
+		
+	}
+	
+	/**
+	 * Delete an array of permissions
+	 *
+	 * @param $permission array
+	 * @return boolean
+	 */
+	public function delete_permissions(array $permissions){
+	
+		foreach($permissions as $permission_name){
+			if(!$this->delete_permission($permission_name)){
+				return false;
+			}
+		}
+		return true;
 	
 	}
 	
