@@ -748,26 +748,17 @@ class AccountsManager{
 	 * @return $users array | null
 	 */
 	public function get_users_by_role(array $roles){
+	
+		$role_names = implode(',' $roles);
 		
-		$role_ids = array();
+		//double join
+		$query = "
+			SELECT asr.subject_id 
+			FROM auth_subject_role AS asr 
+			INNER JOIN auth_role AS ar ON asr.role_id = ar.role_id 
+			WHERE ar.name IN ($role_names)
+		";
 		
-		foreach($roles as $role_name){
-			//this could be false if the role does not exist
-			$role_object = $this->role_manager->roleFetchByName($role_name);
-			if($role_object){
-				$role_ids[] = $role_object->id;
-			}
-		}
-		
-		if(empty($role_ids)){
-			//no roles exist
-			$this->errors[] = $this->lang['role_not_exists'];
-			return null;
-		}
-		
-		$role_ids = implode(',', $role_ids);
-		
-		$query = "SELECT subject_id FROM auth_subject_role WHERE subject_role_id IN ($role_ids)";
 		$sth = $this->db->prepare($query);
 		
 		try{
@@ -783,9 +774,9 @@ class AccountsManager{
 		}catch(PDOException $db_err){
 		
 			if($this->logger){
-				$this->logger->error("Failed to execute query to select subjects from auth subject role based on subject role ids $role_ids", ['exception' => $db_err]);
+				$this->logger->error("Failed to execute query to select subjects from auth subject role based on roles: $role_names", ['exception' => $db_err]);
 			}
-			$this->errors[] = $this->lang['user_select_unsuccessful'];
+			$this->errors[] = $this->lang['user_role_select_unsuccessful'];
 			return false;
 		
 		}
@@ -800,11 +791,52 @@ class AccountsManager{
 	
 	}
 	
-	//get all the users based on array of permissions
+	/**
+	 * Gets an array of users based on an array of permissions
+	 *
+	 * @param $permissions array
+	 * @return $users array | null
+	 */
 	public function get_users_by_permission(array $permissions){
 	
-		//returns an array of RBAC user objects
-		//can use a triple join to speed up the query
+		$permission_names = implode(',', $permissions);
+		
+		//triple join
+		$query = "
+			SELECT asr.subject_id 
+			FROM auth_subject_role AS asr 
+			INNER JOIN auth_role_permissions AS arp ON asr.role_id = arp.role_id
+			INNER JOIN auth_permissions AS ap ON arp.permission_id = ap.permission_id
+			WHERE ap.name IN ($permission_names)
+		";
+		
+		try{
+			
+			$sth->execute();
+			$result = $sth->fetchAll(PDO::FETCH_OBJ);
+			if(!$result){
+				//no users correspond to any of the permissions
+				$this->errors[] = $this->lang['user_permission_select_empty'];
+				return null;
+			}
+		
+		}catch(PDOException $db_err){
+		
+			if($this->logger){
+				$this->logger->error("Failed to execute query to select subjects from auth subject role based on permissions: $permission_names", ['exception' => $db_err]);
+			}
+			$this->errors[] = $this->lang['user_permission_select_unsuccessful'];
+			return false;
+		
+		}
+		
+		$user_ids = array();
+		
+		foreach($result as $row){
+			$user_ids[] = $row->subject_id;
+		}
+		
+		return $this->get_users($user_ids);
 	
 	}
 	
