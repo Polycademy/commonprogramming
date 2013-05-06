@@ -840,41 +840,135 @@ class AccountsManager{
 	
 	}
 	
-	//show all the permissions of a role
-	//accepts an array of roles, and returns an array of roles to description and roles to permission to description
-	public function get_roles_permissions(array $requested_roles){
+	/**
+	 * Gets an array of role objects that contains permission objects from an array of role names
+	 *
+	 * @param $requested_roles array
+	 * @return $roles array | null
+	 */
+	public function get_roles(array $requested_roles){
 	
-		/*
-		$array = array(
-			'admin'	=> array(
-				'desc' => 'Administrators Role',
-				'perms'	=> array(
-					'perm' => 'Description of the Perm'
-				),
-			),
-		);
-		*/
+		$roles = array();
+	
+		foreach($requested_roles as $role_name){
+			if($role = $this->role_manager->fetchRoleByName($role_name)){
+				$roles[$role_name] = $role;
+			}
+		}
+		
+		if(empty($roles)){
+			return null;
+		}
+		
+		//if you want the permissions, just go $roles['role_name']->getPermissions();
+		return $roles;
 	
 	}
 	
-	//uses a similar array to the above!
-	//creates the permissions, assigns them to the roles, saves them
-	public function register_roles_permissions(){
+	/**
+	 * Creates permissions, and assigns them to roles that may be created if they don't already exist
+	 * If they already do exist, the permissions will be replaced and updated
+	 * Also capable of updating the role descriptions
+	 * Use this function when you're constructing an RBAC interface for administrators to create new roles/permissions
+	 *
+	 * $new_roles_permissions is accepted in this manner:
+	 * 	array(
+	 * 		'role_name' => array(
+	 * 			'desc' => 'Description of Role',
+	 * 			'perms' => array( //<- these are optional (empty array still updates; non-existent key is ignored)
+	 * 				'perm_name'	=> 'perm_desc'
+	 * 			)
+	 * 		),
+	 * 		'role_name' => array(
+	 * 			'desc' => '', //<- this is also optional (empty string still updates; non-existent key is ignored)
+	 * 		),
+	 * 		'role_name' => array(
+	 * 			'perms' => array(
+	 * 				'perm_name' => '', //<- perm_desc is not optional but can be left as an empty string
+	 * 			),
+	 * 		),
+	 * 	);
+	 *
+	 * @param $new_roles_permissions array
+	 * @return $roles array of objects
+	 */
+	public function register_roles_permissions(array $new_roles_permissions){
 	
-		//if a role doesn't exist, create it
-		//if a role does exist, update it (this means updating the list of permissions, not necessarily adding to it)
-		//example:
+		$role_names = array();
+	
+		//cycle through the role names
+		foreach($new_roles_permissions as $role_name => $role_data){
 		
-		//role: admin - admin_desc
-		//permission: admin_view - desc
-		//permission: admin_edit - desc
+			//we send role name and description to register role
+			if(isset($role_data['desc']) AND is_string($role_data['desc'])){
+				$role_object = $this->register_role($role_name, $role_data['desc']);
+			}else{
+				$role_object = $this->register_role($role_name);
+			}
+			
+			//at this point role object has already been created or updated
+			//if the perms have not been set, there's no need to update it
+			if(isset($role_data['perms'] AND is_array($role_data['perms'])){
+			
+				//first delete all the old permissions (if they exist!)
+				$old_permissions = $role_object->getPermissions();
+				foreach($old_permissions as $permission_object){
+					$this->role_manager->permissionDelete($permission_object);
+				}
+				
+				//if the perms is not empty, we add/update the new roles
+				//if it were empty, we would leave it with no permissions
+				if(!empty($role_data['perms']){
+					//all permissions will be recreated
+					foreach($role_data['perms'] as $permission_name => $permission_desc){
+						$permission_object = Permission::create($permission_name, $permission_desc);
+						if(!$role_object->addPermission($permission_object)){
+							$this->errors[] = $this->lang('permission_save_unsuccessful');
+							return false;
+						}
+					}
+				}
+				
+				if(!$this->role_manager->roleSave($role_object)){
+					$this->errors[] = $this->lang('role_save_unsuccessful');
+					return false;
+				}
+				
+			}
+			
+			$role_names[] = $role_name;
 		
-		//if role doesn't exist, create it
-		//if admin does exist
-		//and the passed in update is
-		//role: admin - different_desc
-		//permission: admin_edit - new_desc
-		//then the role will be updated to only contain that permission and the other associated updates
+		}
+		
+		return $this->get_roles($role_names);
+	
+	}
+	
+	/**
+	 * Creates or updates a single role given a role name and optionally a role description
+	 *
+	 * @param $role_name string
+	 * @param $role_desc strin
+	 * @return $roles array of objects
+	 */
+	public function register_role($role_name, $role_desc = false){
+	
+		//check if the role already exists
+		if($role_object = $this->role_manager->fetchRoleByName($role_name){
+			//update the existing role (if the role_desc actually exists)
+			$role_object->description = ($role_desc) ? $role_desc : $role_object->description;
+		}else{
+			//create the new role (if the role_desc is false, pass an empty role desc string)
+			$role_desc = ($role_desc) ? $role_desc : '';
+			$role_object = Role::create($role_name, $role_desc);
+		}
+		
+		if(!$this->role_manager->roleSave($role_object)){
+			$this->errors[] = $this->lang('role_save_unsuccessful');
+			return false;
+		}
+		
+		return $role_object;
 	
 	}
 	
@@ -887,6 +981,25 @@ class AccountsManager{
 		//OR array: ('role1', 'role2' => array('perm'));
 		//it either deletes a role completely OR deletes a permission as part of a role, but keeps the role
 	
+	}
+	
+	//we need some functions that allow incremental updates of the role
+	//basically export the $role object (which allows incremental updates.. etc)
+	//then expose the roleSave in the rbac which would update the role or insert the role (but since they wouldn't have access to create the role, it would most likely update)
+	//it's basically a process of using get_roles() -> modify role object -> role_save();
+	public function save_roles(array $roles){
+	
+		foreach($roles as $role){
+			if(is_object($role)){
+				//if at any times the roleSave failed, we have to return false
+				if(!$this->role_manager->roleSave($role)){
+					$this->errors[] = $this->lang('role_save_unsuccessful');
+					return false;
+				}
+			}
+		}
+		return true;
+		
 	}
 	
 	//takes a user id and role object, and adds it to the user and saves it, the role object should have a list of permissions

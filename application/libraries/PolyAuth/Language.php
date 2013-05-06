@@ -56,6 +56,9 @@ class Language implements \ArrayAccess{
 			'role_not_exists'						=> 'Specified role(s) don\'t exist.',
 			'role_already_exists'					=> 'Role name already taken',
 			'role_delete_unsuccessful'				=> 'Unable to delete role',
+			'role_save_unsuccessful'				=> 'Unable to save one of the roles.',
+			// Permissions
+			'permission_save_unsuccessful'			=> 'Unable to save one of the permissions.',
 			// Email
 			'email_activation_subject'				=> 'Account Activation PolyAuth',
 			'email_forgotten_identity_subject'		=> 'Forgotten Identity PolyAuth',
