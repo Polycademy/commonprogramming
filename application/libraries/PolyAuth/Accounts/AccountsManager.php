@@ -919,14 +919,22 @@ class AccountsManager{
 				//if the perms is not empty, we add/update the new roles
 				//if it were empty, we would leave it with no permissions
 				if(!empty($role_data['perms']){
+				
 					//all permissions will be recreated
 					foreach($role_data['perms'] as $permission_name => $permission_desc){
+					
 						$permission_object = Permission::create($permission_name, $permission_desc);
-						if(!$role_object->addPermission($permission_object)){
+						if(!$this->role_manager->permissionSave($permission_object)){
 							$this->errors[] = $this->lang('permission_save_unsuccessful');
 							return false;
 						}
+						if(!$role_object->addPermission($permission_object)){
+							$this->errors[] = $this->lang('permission_assignment_unsuccessful');
+							return false;
+						}
+						
 					}
+					
 				}
 				
 				if(!$this->role_manager->roleSave($role_object)){
@@ -972,8 +980,30 @@ class AccountsManager{
 	
 	}
 	
-	//same kind of thing, specify roles to delete
-	//or specify roles to permissions to delete
+	/**
+	 * Deletes Roles and Permissions. Roles that don't exist will be ignored.
+	 *
+	 * $new_roles_permissions is accepted in this manner:
+	 * 	array(
+	 * 		'role_name' => array(
+	 * 			'desc' => 'Description of Role',
+	 * 			'perms' => array( //<- these are optional (empty array still updates; non-existent key is ignored)
+	 * 				'perm_name'	=> 'perm_desc'
+	 * 			)
+	 * 		),
+	 * 		'role_name' => array(
+	 * 			'desc' => '', //<- this is also optional (empty string still updates; non-existent key is ignored)
+	 * 		),
+	 * 		'role_name' => array(
+	 * 			'perms' => array(
+	 * 				'perm_name' => '', //<- perm_desc is not optional but can be left as an empty string
+	 * 			),
+	 * 		),
+	 * 	);
+	 *
+	 * @param $new_roles_permissions array
+	 * @return $roles array of objects
+	 */
 	public function delete_roles_permissions(array $roles_permissions){
 	
 		//expects array: ('role' => array('perm', 'perm');)
@@ -1010,7 +1040,7 @@ class AccountsManager{
 			$role = $this->role_manager->roleFetchByName($role_name);
 			
 			if(!$this->role_manager->roleAddSubject($role, $user)){
-				$this->errors[] = $this->lang['account_creation_assign_role'];
+				$this->errors[] = $this->lang['role_assignment_unsuccessful'];
 				return false;
 			}
 			

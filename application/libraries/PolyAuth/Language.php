@@ -16,7 +16,6 @@ class Language implements \ArrayAccess{
 			'account_creation_duplicate_username'	=> 'Username already used or invalid',
 			'account_creation_invalid'				=> 'Cannot register without an identity or password.',
 			'account_creation_email_invalid'		=> 'Cannot use email activation without a emails being registered.',
-			'account_creation_assign_role'			=> 'Could not assign the role to newly created account.',
 			// Password
 			'password_change_unsuccessful'			=> 'Unable to Change Password',
 			'password_min'							=> 'Password is not long enough.',
@@ -57,8 +56,10 @@ class Language implements \ArrayAccess{
 			'role_already_exists'					=> 'Role name already taken',
 			'role_delete_unsuccessful'				=> 'Unable to delete role',
 			'role_save_unsuccessful'				=> 'Unable to save one of the roles.',
+			'role_assignment_unsuccessful'			=> 'Could not assign the role to the specified account.',
 			// Permissions
 			'permission_save_unsuccessful'			=> 'Unable to save one of the permissions.',
+			'permission_assignment_unsuccessful'	=> 'Could no assign the permission to the specified role.', 
 			// Email
 			'email_activation_subject'				=> 'Account Activation PolyAuth',
 			'email_forgotten_identity_subject'		=> 'Forgotten Identity PolyAuth',
