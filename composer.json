@@ -23,8 +23,7 @@
         "behat/mink-selenium2-driver": "*",
         "behat/mink-sahi-driver": "*",
         "behat/mink-zombie-driver": "*",
-        "phpunit/phpunit": "3.*",
-		"phpunit/dbunit": ">=1.2"
+		"phpspec/phpspec": "2.0.*@dev"
 	},
     "config": {
         "bin-dir": "bin/"
