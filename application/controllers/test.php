@@ -12,20 +12,47 @@ class Test extends CI_Controller{
 	public function __construct(){
 	
 		parent::__construct();
-		$this->logger = $this->config->item('ioc')['logger'];
-		$this->role_manager  = new RoleManager($this->db->conn_id, $this->logger);
 		
 	}
 	
 	public function index(){
 	
-		//testing out the RBAC
-		//this will be most likely be moved to the model code
+	
+		ob_start();
+
+		session_start();
+		session_write_close();
+
+		session_start();
+		session_write_close();
+
+		session_start();
+		session_write_close();
+
+		session_start();
+		session_write_close();
 		
-		$perm = Permission::create('admin_view', "");
-		if (!$this->role_manager->permissionSave($perm)) {
-			var_dump('COULD NOT SAVE PERMISSION');
+		if(SID){
+			
+			$headers =  array_unique(headers_list());	
+			
+			$cookie_strings = array();
+			
+			foreach($headers as $header){
+				if(preg_match('/^Set-Cookie: (.+)/', $header, $matches)){
+					$cookie_strings[] = $matches[1];
+				}
+			}
+			
+			header_remove('Set-Cookie');
+			
+			foreach($cookie_strings as $cookie){
+				header('Set-Cookie: ' . $cookie, false);
+			}
+		
 		}
+		
+		ob_flush();
 	
 	}
 
