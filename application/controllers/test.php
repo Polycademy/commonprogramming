@@ -1,22 +1,21 @@
 <?php
 
-use RBAC\Permission;
-use RBAC\Role\Role;
-use RBAC\Manager\RoleManager;
+// use RBAC\Permission;
+// use RBAC\Role\Role;
+// use RBAC\Manager\RoleManager;
 
 class Test extends CI_Controller{
 
-	protected $role_manager;
 	protected $logger;
 	
 	public function __construct(){
 	
 		parent::__construct();
+		// $this->logger = $this->config->item('ioc')['logger'];
 		
 	}
 	
-	public function index(){
-	
+	public function index(){	
 	
 		ob_start();
 
@@ -55,6 +54,5 @@ class Test extends CI_Controller{
 		ob_flush();
 	
 	}
-
 
 }
