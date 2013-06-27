@@ -8,11 +8,29 @@
  * Note Pimple is an object that acts like an array, see the actual Pimple code to see how this works.
  * This usage assumes that you have autoloading working, so that the references to the classes will be autoloaded!
  */
- 
+
 $ioc = new Pimple;
 
+//Setup a database connection here, this is for libraries that will require a database connection
+$ioc['Database'] = function($c){
+	$CI = get_instance();
+	$CI->load->database();
+	$dbh = $CI->db->conn_id;
+	return $dbh;
+};
+
+//HERE IS JUST SOME RANDOM EXAMPLES!
+$ioc['WorkerLibrary'] = function($c){
+	return new WorkerLibrary;
+};
+
+//Demonstration of the self-referential $c to use the WorkerLibrary and to pass it in as a dependency to the MasterLibrary
+$ioc['MasterLibrary'] = function($c){
+	return new MasterLibrary($c['WorkerLibrary']);
+};
+
 //MONOLOG BASED LOGGER, use this for libraries that need to log things, in fact this can replace the standard Codeigniter Logger
-$ioc['logger'] = function($c){
+$ioc['Logger'] = function($c){
 
 	if($this->config['log_threshold'] !== 0){
 	
@@ -50,15 +68,17 @@ $ioc['logger'] = function($c){
 	
 };
 
-//HERE IS JUST SOME RANDOM EXAMPLES!
-$ioc['WorkerLibrary'] = function($c){
-	return new WorkerLibrary;
-};
+// $ioc['Options'] = function($c){
+// 	return new PolyAuth\Options
+// }
 
-//Demonstration of the self-referential $c to use the WorkerLibrary and to pass it in as a dependency to the MasterLibrary
-$ioc['MasterLibrary'] = function($c){
-	return new MasterLibrary($c['WorkerLibrary']);
-};
+// $ioc['AccountsManager'] = function($c){
+
+// 	$accounts_manager = new PolyAuth\AccountsManager($c['Database']);
+
+// 	return $accounts_manager;
+
+// }
 
 //we need to pass the $ioc into the global $config variable, so now it can be accessed by Codeigniter
 $config['ioc'] = $ioc;

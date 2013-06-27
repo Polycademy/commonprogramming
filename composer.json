@@ -1,12 +1,12 @@
 {
     "require":{
+		"monolog/monolog": "*",
 		"cboden/Ratchet": "*",
-		"react/zmq": "dev-master",
+		"react/zmq": "*",
 		"pimple/pimple": "*",
 		"polycademy/citemplating": "*",
 		"polycademy/validation": "*",
 		"jamierumbelow/pigeon": "*",
-		"monolog/monolog": "*",
 		"polycademy/polyauth": "*"
 	},
 	"require-dev":{

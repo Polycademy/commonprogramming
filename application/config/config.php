@@ -301,7 +301,7 @@ $config['sess_cookie_name']		= 'session';
 $config['sess_expiration']		= 7200;
 $config['sess_expire_on_close']	= FALSE;
 $config['sess_encrypt_cookie']	= TRUE;
-$config['sess_use_database']	= TRUE; //switch this off and run the migration first, then switch back on!
+$config['sess_use_database']	= FALSE;
 $config['sess_table_name']		= 'sessions';
 $config['sess_match_ip']		= FALSE;
 $config['sess_match_useragent']	= TRUE;
@@ -319,7 +319,7 @@ $config['sess_time_to_update']	= 300;
 | 'cookie_httponly' = Cookie will only be accessible via HTTP(S) (no javascript)
 |
 */
-$config['cookie_prefix']	= 'polycademy2_';
+$config['cookie_prefix']	= 'polycademy_commonprogramming_';
 $config['cookie_domain']	= '';
 $config['cookie_path']		= '/';
 $config['cookie_secure']	= FALSE;
