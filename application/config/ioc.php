@@ -8,7 +8,7 @@
  * The functions can also be "shared", so they are not executed everytime it is called, even more lazier loading!
  * Note Pimple is an object that acts like an array, see the actual Pimple code to see how this works.
  * This usage assumes that you have autoloading working, so that the references to the classes will be autoloaded!
- * $this corresponds to the config files. It can be accessed inside the closures in 5.4.
+ * "$this->config" corresponds to the config files. It can be accessed inside the closures in 5.4.
  */
 
 $ioc = new Pimple;
@@ -21,16 +21,6 @@ $ioc['Database'] = $ioc->share(function($c){
 	$dbh = $CI->db->conn_id;
 	return $dbh;
 });
-
-//HERE IS JUST SOME RANDOM EXAMPLES!
-$ioc['WorkerLibrary'] = function($c){
-	return new WorkerLibrary;
-};
-
-//Demonstration of the self-referential $c to use the WorkerLibrary and to pass it in as a dependency to the MasterLibrary
-$ioc['MasterLibrary'] = function($c){
-	return new MasterLibrary($c['WorkerLibrary']);
-};
 
 //MONOLOG BASED LOGGER, use this for libraries that need to log things, in fact this can replace the standard Codeigniter Logger
 $ioc['Logger'] = $ioc->share(function($c){
@@ -72,17 +62,29 @@ $ioc['Logger'] = $ioc->share(function($c){
 	
 });
 
-// $ioc['Options'] = function($c){
-// 	return new PolyAuth\Options
-// }
+//Using PolyAuth!
 
-// $ioc['AccountsManager'] = function($c){
+$ioc['PolyAuth\Options'] = $ioc->share(function($c){
+	return new PolyAuth\Options($this->config['polyauth']);
+});
 
-// 	$accounts_manager = new PolyAuth\AccountsManager($c['Database']);
+$ioc['PolyAuth\Language'] = $ioc->share(function($c){
+	//it's possible to get a custom language file, you would need to load it from the get_instance just like how the $dbh was handled
+	return new PolyAuth\Language;
+});
 
-// 	return $accounts_manager;
+$ioc['PolyAuth\Accounts\AccountsManager'] = $ioc->share(function($c){
 
-// }
+	$accounts_manager = new PolyAuth\Accounts\AccountsManager(
+		$c['Database'], 
+		$c['PolyAuth\Options'], 
+		$c['PolyAuth\Language'], 
+		$c['Logger']
+	);
+
+	return $accounts_manager;
+
+});
 
 //we need to pass the $ioc into the global $config variable, so now it can be accessed by Codeigniter
 $config['ioc'] = $ioc;

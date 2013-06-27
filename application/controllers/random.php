@@ -23,16 +23,6 @@ class Random extends CI_Controller{
 		
 	}
 	
-	public function test_ioc(){
-	
-		$ioc = $this->config->item('ioc');
-		
-		$masterlibrary = $ioc['MasterLibrary'];
-		
-		$masterlibrary->do_something();
-		
-	}
-	
 	public function test_shell(){
 		
 		$descriptor_spec = array(

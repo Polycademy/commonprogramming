@@ -123,7 +123,8 @@ $autoload['helper'] = array('url', 'date', 'array');
 |
 */
 
-$autoload['config'] = array('sitemeta', 'ioc');
+//make sure the ioc is at the end! It may require certain config files to be loaded!
+$autoload['config'] = array('sitemeta', 'polyauth', 'ioc');
 
 
 /*
