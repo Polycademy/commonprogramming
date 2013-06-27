@@ -1,6 +1,6 @@
 <?php
 
-namespace PolycademyRealtime;
+namespace Realtime;
 
 //this class attempts to bind the PHP binary
 class FindBinary{

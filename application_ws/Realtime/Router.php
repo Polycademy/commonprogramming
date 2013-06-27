@@ -1,6 +1,6 @@
 <?php
 
-namespace PolycademyRealtime;
+namespace Realtime;
 
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;

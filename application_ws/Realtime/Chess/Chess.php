@@ -1,6 +1,6 @@
 <?php
 
-namespace PolycademyRealtime\Chess;
+namespace Realtime\Chess;
 
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;

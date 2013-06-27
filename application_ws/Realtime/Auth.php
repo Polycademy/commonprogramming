@@ -1,9 +1,9 @@
 <?php
 
-namespace PolycademyRealtime;
+namespace Realtime;
 
 use Ratchet\ConnectionInterface;
-use PolycademyRealtime\FindBinary;
+use Realtime\FindBinary;
 
 //this class will send a request to authenticate on the first web socket connection open
 class Auth{
