@@ -5,20 +5,22 @@
  * The functions will not be processed when the PHP interpreter goes through this file.
  * They will be kept inside the function waiting to be called as part of the container array.
  * Once you call the functions, then the objects will be created! Thus "lazy loading", not "eager loading". Saves memory too!
+ * The functions can also be "shared", so they are not executed everytime it is called, even more lazier loading!
  * Note Pimple is an object that acts like an array, see the actual Pimple code to see how this works.
  * This usage assumes that you have autoloading working, so that the references to the classes will be autoloaded!
+ * $this corresponds to the config files. It can be accessed inside the closures in 5.4.
  */
 
 $ioc = new Pimple;
 
 //Setup a database connection here, this is for libraries that will require a database connection
 //this only works for PDO based connections (which you should be using!)
-$ioc['Database'] = function($c){
+$ioc['Database'] = $ioc->share(function($c){
 	$CI = get_instance();
 	$CI->load->database();
 	$dbh = $CI->db->conn_id;
 	return $dbh;
-};
+});
 
 //HERE IS JUST SOME RANDOM EXAMPLES!
 $ioc['WorkerLibrary'] = function($c){
@@ -31,8 +33,9 @@ $ioc['MasterLibrary'] = function($c){
 };
 
 //MONOLOG BASED LOGGER, use this for libraries that need to log things, in fact this can replace the standard Codeigniter Logger
-$ioc['Logger'] = function($c){
+$ioc['Logger'] = $ioc->share(function($c){
 
+	//$this is available inside the anonymous function in 5.4
 	if($this->config['log_threshold'] !== 0){
 	
 		$log_path = ($this->config['log_path'] !== '') ? $this->config['log_path'] : APPPATH.'logs/';
@@ -67,7 +70,7 @@ $ioc['Logger'] = function($c){
 	
 	return $logger;
 	
-};
+});
 
 // $ioc['Options'] = function($c){
 // 	return new PolyAuth\Options
