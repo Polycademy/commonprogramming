@@ -1,23 +1,37 @@
 <?php
 
+/**
+ * Loads secrets into the application. If no secrets are loaded, it will close the application and announce this.
+ */
 class Secrets{
-	
-	public function __construct(){
-
-
-	}
 
 	public function load(){
-
-		//see if there are any .php files
-		//if there are, load them and run them
 		
+		$secrets_path = FCPATH . '/secrets';
+		$secrets_loaded = false;
 
-		//see if "secrets folder exists"
-		if(file_exists(FCPATH . '/secrets') AND is_dir(FCPATH . '/secrets')){
-			echo 'YAY';
+		//see if "secrets folder" exists
+		if(file_exists($secrets_path) AND is_dir($secrets_path)){
+
+			foreach(new DirectoryIterator($secrets_path) as $file){
+
+				//ignore dots and non-php extensions
+				if($file->isDot() OR $file->getExtension() != 'php') continue;
+				
+				$secrets_loaded = true;
+
+				include_once($file->getPathname());
+
+			}
+
 		}
-		
+
+		if(!$secrets_loaded){
+
+			die('Secrets have not been loaded! You may need to set at least the encryption secret.');
+
+		}
+
 	}
 
 }

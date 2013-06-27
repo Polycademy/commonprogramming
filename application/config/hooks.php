@@ -35,6 +35,9 @@
 |	http://codeigniter.com/user_guide/general/hooks.html
 |
 */
+
+//don't use __construct for function, it will execute it twice!
+
 $hook['pre_system'][] = array(
     'class'		=> 'Autoloader',
     'function'  => 'register',
