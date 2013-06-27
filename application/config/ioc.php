@@ -12,6 +12,7 @@
 $ioc = new Pimple;
 
 //Setup a database connection here, this is for libraries that will require a database connection
+//this only works for PDO based connections (which you should be using!)
 $ioc['Database'] = function($c){
 	$CI = get_instance();
 	$CI->load->database();
