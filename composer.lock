@@ -607,16 +607,16 @@
         },
         {
             "name": "polycademy/polyauth",
-            "version": "1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Polycademy/PolyAuth.git",
-                "reference": "1.0.2"
+                "reference": "1.0.3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Polycademy/PolyAuth/zipball/1.0.2",
-                "reference": "1.0.2",
+                "url": "https://api.github.com/repos/Polycademy/PolyAuth/zipball/1.0.3",
+                "reference": "1.0.3",
                 "shasum": ""
             },
             "require": {
@@ -663,7 +663,7 @@
                 "sessions",
                 "user accounts"
             ],
-            "time": "2013-06-27 17:50:01"
+            "time": "2013-06-27 18:18:33"
         },
         {
             "name": "polycademy/validation",

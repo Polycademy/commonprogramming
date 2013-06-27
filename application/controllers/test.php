@@ -11,7 +11,7 @@ class Test extends CI_Controller{
 		$this->accounts_manager = $ioc['PolyAuth\Accounts\AccountsManager'];
 
 		$user = $this->accounts_manager->get_user(1);
-		var_dump($user['username']);
+		var_dump($user['ipAddress']);
 		
 	}
 	
