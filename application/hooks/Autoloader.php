@@ -1,5 +1,5 @@
 <?php
- 
+
 class Autoloader{
  
     public function __construct(){
@@ -8,10 +8,14 @@ class Autoloader{
         if(file_exists(FCPATH . '/vendor/autoload.php')){
             include_once FCPATH . '/vendor/autoload.php';
         }
-		
+ 
+    }
+
+    public function register(){
+        
         //STANDARD AUTOLOADER
         spl_autoload_register(array($this, 'autoload'));
- 
+
     }
  
     public function autoload($class){

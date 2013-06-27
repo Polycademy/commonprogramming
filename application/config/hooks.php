@@ -35,11 +35,17 @@
 |	http://codeigniter.com/user_guide/general/hooks.html
 |
 */
-//pre_system autoloader
-$hook['pre_system'] = array(
-    'class' => 'Autoloader',
-    'function'  => '__construct',
+$hook['pre_system'][] = array(
+    'class'		=> 'Autoloader',
+    'function'  => 'register',
     'filename'  => 'Autoloader.php',
+    'filepath'  => 'hooks',
+);
+
+$hook['pre_system'][] = array(
+    'class'		=> 'Secrets',
+    'function'  => 'load',
+    'filename'  => 'Secrets.php',
     'filepath'  => 'hooks',
 );
 
