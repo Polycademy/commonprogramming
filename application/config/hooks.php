@@ -45,12 +45,5 @@ $hook['pre_system'][] = array(
     'filepath'  => 'hooks',
 );
 
-$hook['pre_system'][] = array(
-    'class'		=> 'Secrets',
-    'function'  => 'load',
-    'filename'  => 'Secrets.php',
-    'filepath'  => 'hooks',
-);
-
 /* End of file hooks.php */
 /* Location: ./application/config/hooks.php */
