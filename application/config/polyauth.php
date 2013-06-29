@@ -2,4 +2,6 @@
 
 //PolyAuth Options
 
-$config['polyauth'] = array();
+$config['polyauth'] = array(
+	'email'	=> true,
+);
