@@ -15,6 +15,9 @@ Pigeon::map(function($r){
 		
 		//for random code to test
 		$r->resources('test');
+
+		//for authentication and authorisation tests
+		$r->resources('authtests');
 		
 		//generic CRUD demonstration
 		$r->resources('courses');

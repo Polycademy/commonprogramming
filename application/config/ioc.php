@@ -85,6 +85,18 @@ $ioc['PolyAuth\AuthStrategies\HTTPStrategy'] = $ioc->share(function($c){
 
 });
 
+$ioc['PolyAuth\AuthStrategies\CookieStrategy'] = $ioc->share(function($c){
+
+	$cookie_strategy = new PolyAuth\AuthStrategies\CookieStrategy(
+		$c['Database'],
+		$c['PolyAuth\Options'],
+		$c['Logger']
+	);
+
+	return $cookie_strategy;
+
+});
+
 $ioc['PolyAuth\Accounts\AccountsManager'] = $ioc->share(function($c){
 
 	$accounts_manager = new PolyAuth\Accounts\AccountsManager(
@@ -101,7 +113,7 @@ $ioc['PolyAuth\Accounts\AccountsManager'] = $ioc->share(function($c){
 $ioc['PolyAuth\Sessions\UserSessions'] = $ioc->share(function($c){
 
 	$user_sessions = new PolyAuth\Sessions\UserSessions(
-		$c['PolyAuth\AuthStrategies\HTTPStrategy'],
+		$c['PolyAuth\AuthStrategies\CookieStrategy'],
 		$c['Database'],
 		$c['PolyAuth\Options'],
 		$c['PolyAuth\Language'],
