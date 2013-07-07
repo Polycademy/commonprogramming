@@ -12,9 +12,15 @@ Pigeon::map(function($r){
 		$r->get('migrate/version/(:num)', 'migrate/version/$1');
 		$r->get('migrate/restart',  'migrate/restart');
 		$r->get('migrate/restart/(:num)',  'migrate/restart/$1');
+
+		//various demonstrations of code
+		$r->get('random/(:any)', 'random/$1');
 		
 		//for random code to test
-		$r->resources('test');
+		$r->get('test/(:any)', 'test/$1');
+
+		//oauth test
+		$r->get('oauthtest', 'oauthtest/index');
 
 		//for authentication and authorisation tests
 		$r->resources('authtests');

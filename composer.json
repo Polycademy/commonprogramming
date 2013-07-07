@@ -7,12 +7,12 @@
 		"polycademy/citemplating": "*",
 		"polycademy/validation": "*",
 		"jamierumbelow/pigeon": "*",
-		"polycademy/polyauth": "*"
+		"polycademy/polyauth": "*",
+		"lusitanian/oauth": "0.1.*@dev"
 	},
 	"require-dev":{
 		"firephp/firephp-core": "dev-master",
-		"codeception/codeception": "@stable",
-		"phpspec/phpspec": "2.0.*@dev"
+		"codeception/codeception": "@stable"
 	},
     "config": {
         "bin-dir": "bin/"

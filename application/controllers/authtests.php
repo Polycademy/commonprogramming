@@ -32,8 +32,7 @@ class Authtests extends CI_Controller{
 		try{
 			$this->user_sessions->login(array(
 				'identity'	=> 'administrator',
-				'password'	=> 'password',
-				'autologin'	=> true,
+				'password'	=> 'password'
 			));
 			echo "I am logged in \n";
 		}catch(PolyAuthException $e){
