@@ -156,9 +156,9 @@
 		<script src="js/vendor/codemirror/mode/javascript.js"></script>
 		
 		<!-- Shims and Shivs and Other Useful Things -->
-		<!--[if lt IE 9]><script src="js/vendor/es5-shim.min.js"></script><![endif]-->
+		<script src="js/vendor/es5-shim.min.js"></script>
 		<script src="js/vendor/es6-shim.min.js"></script>
-		<!--[if lt IE 9]><script src="js/vendor/json3.min.js"></script><![endif]-->
+		<script src="js/vendor/json3.min.js"></script>
 		
 		<? if(ENVIRONMENT == 'development'){ ?>
 			<?

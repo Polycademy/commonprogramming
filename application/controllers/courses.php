@@ -136,7 +136,7 @@ class Courses extends CI_Controller{
 		
 		$data = $this->input->json(false, true);
 		
-		$query = $this->Courses_model->update($data, $id);
+		$query = $this->Courses_model->update($id, $data);
 		
 		if($query){
 		

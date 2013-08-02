@@ -9,7 +9,7 @@ use OAuth\Common\Http\Uri\Uri; //seems useless
 use OAuth\Common\Http\Uri\UriFactory;
 
 //storage
-use OAuth\Common\Storage\Memory;
+use OAuth\Common\Storage\Session;
 
 //analysing credentials
 use OAuth\Common\Consumer\Credentials;
@@ -35,10 +35,10 @@ class Oauthtest extends CI_Controller{
 		$uri_factory = new UriFactory;
 		$this->current_uri = $uri_factory->createFromSuperGlobalArray($_SERVER);
 		//this is for query parameters (might be useful if you need carry over query parameters...)
-		$this->current_uri->setQuery('');
+		$this->current_uri->addToQuery('lol', 'blah');
 
 		//storage
-		$storage = new Memory;
+		$storage = new Session(true, 'Some Oauth Cookie');
 
 		//credentials KEY, SECRET, REDIRECT URI! (HERE WE CAN SET A CUSTOM REDIRECT URI)
 		$credentials = new Credentials(
@@ -57,7 +57,7 @@ class Oauthtest extends CI_Controller{
 		$service_factory = new ServiceFactory;
 		//name, credentials, storage, scope
 		$this->github = $service_factory->createService(
-			'Github',
+			'github', //does this require capitalisation?
 			$credentials,
 			$storage,
 			['user']
@@ -80,13 +80,17 @@ class Oauthtest extends CI_Controller{
 		//However that would require us to manually set the redirect uri, not based on the current page which it is automatically doing currently
 		echo $this->github->getAuthorizationUri();
 
+		var_dump($this->github->getStorage());
+
 		//CHECK IF AUTHORIZATION CODE IS PASSED IN
 		if(!empty($_GET['code'])){
 
 			//ok this means we have code being sent back from the service (this could be faked, and we would need a failsafe)
 			//exchange for access token!
 			try {
-				$this->github->requestAccessToken($_GET['code']);
+				$token = $this->github->requestAccessToken($_GET['code']);
+				var_dump($this->github->getStorage()->retrieveAccessToken());
+				var_dump($token);
 			}catch(TokenResponseException $e){
 				//at this point we should check if that worked, it would throw an exception if it didn't, in which case we'll simply disregard the login attempt
 				var_dump('Code is incorrect, or has already been used. Try again. ERROR: ' . $e->getMessage());

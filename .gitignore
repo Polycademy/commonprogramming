@@ -8,5 +8,5 @@ bin/*
 node_modules/*
 build/*
 .c9revisions/*
-secrets/*
-!secrets/*.example
+.secrets/*
+!.secrets/*.example

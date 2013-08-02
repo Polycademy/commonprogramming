@@ -1,0 +1,5 @@
+<?php
+
+//api keys
+
+$secrets['facebook_code'] = 'example facebook token!';

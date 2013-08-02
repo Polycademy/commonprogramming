@@ -50,6 +50,10 @@ class MY_Loader extends CI_Loader
             define('SPARKPATH', 'sparks/');
         }
 
+        if(!defined('EXT')){
+            define('EXT', '.php');
+        }
+
         $this->_is_lt_210 = (is_callable(array('CI_Loader', 'ci_autoloader'))
                                || is_callable(array('CI_Loader', '_ci_autoloader')));
 

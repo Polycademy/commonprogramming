@@ -272,16 +272,16 @@
         },
         {
             "name": "leighmacdonald/php_rbac",
-            "version": "0.9.0",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/leighmacdonald/php_rbac.git",
-                "reference": "0.9.0"
+                "reference": "1.0.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/leighmacdonald/php_rbac/zipball/0.9.0",
-                "reference": "0.9.0",
+                "url": "https://api.github.com/repos/leighmacdonald/php_rbac/zipball/1.0.0",
+                "reference": "1.0.0",
                 "shasum": ""
             },
             "require": {
@@ -319,7 +319,7 @@
                 "database",
                 "rbac"
             ],
-            "time": "2013-05-12 08:49:38"
+            "time": "2013-07-08 02:21:49"
         },
         {
             "name": "lusitanian/oauth",
@@ -327,12 +327,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Lusitanian/PHPoAuthLib.git",
-                "reference": "4c6e345c54c4f0a0be5ae20f81ff83e2ac984c4c"
+                "reference": "c2e166d7c2cfae6a7e29f4f2545d4f48e6835137"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Lusitanian/PHPoAuthLib/zipball/4c6e345c54c4f0a0be5ae20f81ff83e2ac984c4c",
-                "reference": "4c6e345c54c4f0a0be5ae20f81ff83e2ac984c4c",
+                "url": "https://api.github.com/repos/Lusitanian/PHPoAuthLib/zipball/c2e166d7c2cfae6a7e29f4f2545d4f48e6835137",
+                "reference": "c2e166d7c2cfae6a7e29f4f2545d4f48e6835137",
                 "shasum": ""
             },
             "require": {
@@ -373,7 +373,7 @@
                 "oauth",
                 "security"
             ],
-            "time": "2013-06-28 18:50:29"
+            "time": "2013-07-09 16:48:21"
         },
         {
             "name": "monolog/monolog",

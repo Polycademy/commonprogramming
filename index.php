@@ -271,7 +271,7 @@ switch (ENVIRONMENT)
  *
  * Will load the secrets into the application
  */
-require_once('secrets/Secrets.php');
+require_once('.secrets/Secrets.php');
 Secrets::load();
 
 /*
