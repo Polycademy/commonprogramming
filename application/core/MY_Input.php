@@ -3,6 +3,8 @@
 class MY_Input extends CI_Input{
 
 	//extract json input data from input stream
+	//note that XSS clean results in an extra semi-colon if the string uses ampersand '&' by itself
+	//this may result in problems, so try different methods if you need to have '&' unmolested
 	public function json($index = false, $xss_clean = false, $return_as_object = false){
 	
 		if($return_as_object){
