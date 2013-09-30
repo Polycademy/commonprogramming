@@ -1,11 +1,11 @@
 <?php
 
-namespace Realtime\Chat;
+namespace PolycademyRealtime\Chat;
 
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
 
-use Realtime\FindBinary;
+use PolycademyRealtime\FindBinary;
 
 class Chat implements WampServerInterface {
 
