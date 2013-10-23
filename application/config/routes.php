@@ -1,5 +1,8 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+/*
+	PIGEON ROUTING
+ */
 Pigeon::map(function($r){
 	
 	//RESOURCES ROUTING
@@ -15,6 +18,7 @@ Pigeon::map(function($r){
 
 		//various demonstrations of code
 		$r->get('random/(:any)', 'random/$1');
+		$r->post('random/(:any)', 'random/$1');
 		
 		//for random code to test
 		$r->get('test/(:any)', 'test/$1');
@@ -64,6 +68,11 @@ Pigeon::map(function($r){
 });
 
 $route = Pigeon::draw();
-
 $route['default_controller'] = 'home';
 $route['404_override'] = '';
+
+/*
+	CSRF EXCLUSION, use api paths
+ */
+$config =& load_class('Config', 'core');
+$config->set_item('csrf_exclude_uris', array());

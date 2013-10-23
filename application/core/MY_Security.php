@@ -10,7 +10,7 @@ class MY_Security extends CI_Security{
 		if(strtoupper($_SERVER['REQUEST_METHOD']) == 'GET'){
 			return $this->csrf_set_cookie();
 		}
-		
+
 		// Check if URI has been whitelisted from CSRF checks
 		if($exclude_uris = config_item('csrf_exclude_uris')){
 			$uri = load_class('URI', 'core');

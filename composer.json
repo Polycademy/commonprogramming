@@ -8,7 +8,8 @@
 		"polycademy/validation": "*",
 		"jamierumbelow/pigeon": "*",
 		"polycademy/polyauth": "*",
-		"lusitanian/oauth": "0.1.*@dev"
+		"lusitanian/oauth": "*",
+		"symfony/http-foundation": "2.3.6"
 	},
 	"require-dev":{
 		"firephp/firephp-core": "dev-master",
