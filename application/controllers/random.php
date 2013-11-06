@@ -13,6 +13,118 @@ class Random extends CI_Controller{
 		FB::log('I am logging from firephp!');
 	}
 
+	public function test_decode2(){
+
+		$result = file_get_contents('D:/youtube.txt');
+
+		$json = json_decode($result, true);
+
+		$ifp = fopen('D:/random.png', "wb"); 
+		fwrite($ifp, base64_decode($json['screenshot'])); 
+		fclose($ifp);
+
+	}
+
+	public function test_decode(){
+
+		$postdata = json_encode(
+		    array(
+		        'url' => 'http://polycademy.com',
+		        'callback' => "var box = document.getElementsByClassName('grid_box')[0]; box.style.height = '400px';"
+		    )
+		);
+
+		$opts = array('http' =>
+		    array(
+		        'method'  => 'POST',
+		        'header'  => 'Content-type: application/json',
+		        'content' => $postdata
+		    )
+		);
+
+		$context  = stream_context_create($opts);
+
+		$result = file_get_contents('http://localhost:8989', false, $context);
+
+		$json = json_decode($result, true);
+
+		$ifp = fopen('D:/random.png', "wb"); 
+		fwrite($ifp, base64_decode($json['screenshot'])); 
+		fclose($ifp);
+
+	}
+
+	public function test_getting(){
+
+		// $uri = 'https://google.com';
+
+		$ctx = stream_context_create(array(
+			'http' => array(
+				'header' => "Accept: application/xrds+xml\r\n",
+			)
+		));
+
+		// $ctx = null;
+
+		// $fh = @fopen($uri, 'r', false, $ctx);
+
+		// $details = stream_get_meta_data($fh);
+
+		// var_dump($details);
+
+		//$level = error_reporting(0);
+		fopen('http://google.com', 'r', false, $ctx);
+		//error_reporting($level);
+
+		var_dump(error_get_last());
+
+
+
+	}
+
+	public function test_urls(){
+
+		//xri://@free*cmcdragonkai/blah/blah?lol=fgfdg
+		$uri = 'blahblah.com';
+
+		//first remove the xri:// scheme if it exists
+		if(substr($uri, 0, 6) == 'xri://'){
+			$uri = substr($uri, 6);
+		}
+
+		//xri parsing, xris could also be passed without the xri:// scheme
+		if(in_array($uri[0], array('=', '@', '+', '$', '!'))){
+			
+			//add the xri proxy resolver
+			$uri = $this->xri_resolver . $uri;
+
+			$uri = Purl\Url::parse($uri);
+			if(!$uri->getData()){
+				return false;
+			}
+
+			//add the xrds query parameter to get the xrds document for discovery
+			$uri->query->set('_xrd_r', 'application/xrds+xml');
+
+			var_dump($uri->getUrl());
+
+		}
+
+		//parse normal http urls
+		$uri = Purl\Url::parse($uri);
+		if(!$uri->getData()){
+			return false;
+		}
+
+		//add http:// if needed
+		if(!$uri->scheme){
+			$uri->scheme = 'http';
+		}
+
+		var_dump($uri);
+
+	}
+
 	public function test_session(){
 		echo session_save_path();
 	}
